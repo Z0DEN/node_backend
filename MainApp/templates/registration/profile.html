@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Профиль пользователя </title>
+    <link id="favicon" rel="icon" type="image/x-icon" href="{% static 'images/cloud.svg' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+    <script src="{% static 'js/profile.js' %}" defer="defer"></script>
+</head>
+<body>
+    <header>
+        <h1>Профиль пользователя</h1>
+    </header>
+    <div class="profile-info">
+        <div>
+          <h2>Profile</h2>
+          <p>Username: {{ user.username }}</p>
+          <p>Email: {{ user.email }}</p>
+          <p>Node domain: {{ user.node_domain }}</p>
+        </div>
+      <div>
+        <h3>
+          <a href="https://cloudblesk.site/accounts/logout/">Выйти из аккаунта</a>
+        </h3>
+      </div>
+</body>
+</html>
