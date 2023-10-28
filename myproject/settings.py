@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_project',
+        'NAME': 'node_backend',
         'PASSWORD': 'djangoisme',
         'USER': 'django_user',
         'HOST': '/var/run/postgresql',
@@ -138,9 +138,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/accounts/login'
-LOGOUT_URL = '/accounts/logout/'
-LOGIN_REDIRECT_URL = reverse_lazy('MainApp:profile')
 AUTH_USER_MODEL = 'MainApp.CloudUser'
 
 CSRF_COOKIE_NAME = 'csrftoken'
