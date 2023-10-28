@@ -13,7 +13,7 @@ from pathlib import Path
 import os
 
 
-ALLOWED_HOSTS = ['localhost','192.168.0.98','176.197.34.213','cloudblesk.site','127.0.0.1']
+ALLOWED_HOSTS = ['localhost',os.environ.get('IPADDR'),'127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['https://cloudblesk.site']
 
@@ -87,8 +87,8 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'node_backend',
-        'PASSWORD': 'djangoisme',
+        'NAME': os.environ.get('DBNAME'),
+        'PASSWORD': os.environ.get('DBPASSWORD'),
         'USER': 'django_user',
         'HOST': '/var/run/postgresql',
         'PORT': '',
