@@ -19,6 +19,7 @@ dbus-python
 decorator
 distro
 Django
+django-sslserver
 django-cors-headers
 django-crispy-forms
 django-rest-auth
