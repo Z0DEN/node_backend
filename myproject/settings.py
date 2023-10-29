@@ -13,9 +13,16 @@ from pathlib import Path
 import os
 
 
-ALLOWED_HOSTS = ['localhost',os.environ.get('IPADDR'),'127.0.0.1']
+ALLOWED_HOSTS = ['localhost',os.environ.get('IPADDR'),'192.168.0.98','127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://cloudblesk.site']
+CSRF_TRUSTED_ORIGINS = [
+    "http://192.168.0.98",
+    "http://localhost",
+    "http://127.0.0.1",
+]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,6 +50,7 @@ INSTALLED_APPS = [
     'MainApp.apps.MainConfig',
     'crispy_forms',
     'crispy_bootstrap5',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
@@ -57,7 +65,9 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://cloudblesk.site",
+    "https://192.168.0.98",
+    "localhost",
+    "127.0.0.1",
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -138,7 +148,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'MainApp.CloudUser'
+AUTH_USER_MODEL = 'MainApp.clouduser'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 

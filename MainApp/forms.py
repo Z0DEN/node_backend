@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CloudUser
+from .models import clouduser
 
 
 class CloudUserAuthForm(UserCreationForm):
@@ -8,7 +8,7 @@ class CloudUserAuthForm(UserCreationForm):
     password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
     class Meta:
-        model = CloudUser
+        model = clouduser
         fields = ('username', 'password1', 'password2')
         help_texts = {
             'username': None,
@@ -22,7 +22,7 @@ class CloudUserLoginForm(UserCreationForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
 
     class Meta:
-        model = CloudUser
+        model = clouduser
         fields = ('username', 'password1', 'password2')
         exclude = ['password2']
 

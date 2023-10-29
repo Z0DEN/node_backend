@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import CloudUser
+from .models import clouduser 
 
-admin.site.register(CloudUser)
+admin.site.register(clouduser)
