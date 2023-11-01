@@ -23,6 +23,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SERVER_CERTIFICATE = '/certificate.crt'
+SERVER_KEY = '/django.key'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
