@@ -9,6 +9,9 @@ if [ -f "/certificate.crt" ]; then
 	interact
 	'
 else
+	python3 /node_backend/manage.py makemigrations
+	python3 /node_backend/manage.py migrate
+
 	CERTBOT_PASSWORD=$(openssl rand -base64 12)
 
 	echo 'export CERTBOT_PASSWORD="'$CERTBOT_PASSWORD'"' >> ~/.bashrc
