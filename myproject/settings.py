@@ -13,7 +13,7 @@ from pathlib import Path
 import os
 
 
-ALLOWED_HOSTS = ['localhost',os.environ.get('IPADDR'),'192.168.0.98','127.0.0.1']
+ALLOWED_HOSTS = ['localhost',os.environ.get('EX_IP'),os.environ.get('INB_IP'),'127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     "http://192.168.0.98",
