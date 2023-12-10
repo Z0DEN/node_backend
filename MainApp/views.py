@@ -68,25 +68,23 @@ class LoginView(View):
         return render(request, self.template_name, {'form': form})
 
 
-@csrf_exempt
-def NodeConnection(request):
+@login_required
+def AddUser(request):
     if request.method == 'POST':
 
-        node_domain = request.POST['node_domain']
-        ip_address = request.POST['ip_address']
+        user = request.POST['username']
 
-        if not node_domain:
-            return JsonResponse({'success': False, 'message': 'Неверное доменное имя'})
-        if not ip_address:
-            return JsonResponse({'success': False, 'message': 'Неверный ip адрес'})
+        if not user:
+            return HttpResponse("POST request have no 'username' field")
 
-        new_node = NodeModel(
-            node_domain=node_domain,
-            ip_address=ip_address,
-            user_quantity=0,
+        new_user = UserDataModel(
+            username=user,
+            FolderName=None,
+            FolderParent=None,
+            date_added=
         )
 
-        new_node.save()
+        new_user.save()
 
         # Add a Content-Type header to the response
         response = JsonResponse({
@@ -95,13 +93,12 @@ def NodeConnection(request):
             'ip_address': ip_address,
             'date': date,
         })
-        response['Content-Type'] = 'application/json'
 
-        return response
 
     else:
         print('method=get')
         return HttpResponse('Invalid request method.')
+    
 
 
 @csrf_protect
