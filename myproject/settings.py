@@ -12,11 +12,12 @@ from django.urls import reverse_lazy
 from pathlib import Path
 import os
 
+EX_IP = os.environ.get('EX_IP')
+IN_IP = os.environ.get('IN_IP')
 
-ALLOWED_HOSTS = ['localhost',os.environ.get('IPADDR'),'192.168.0.98','127.0.0.1']
+ALLOWED_HOSTS = [IN_IP,'localhost','127.0.0.1',EX_IP]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://192.168.0.98",
     "http://localhost",
     "http://127.0.0.1",
 ]
