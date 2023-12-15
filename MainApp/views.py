@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+import datetime
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from MainApp.models import MainUserModel, UserDataModel
@@ -6,29 +7,27 @@ from MainApp.models import MainUserModel, UserDataModel
 
 def AddUser(request):
     if request.method == 'POST':
-
-        user = request.POST['username']
-
+        username = request.POST['username']
         if not user:
             return HttpResponse("POST request have no 'username' field")
 
-        new_user = UserDataModel(
-            username=user,
-            FolderName=None,
-            FolderParent=None,
-            date_added=
+        new_user = MainUserModel(
+                username = username,
         )
 
         new_user.save()
+        
+        new_user_data = UserDataModel(
+            username=new_user,
+            FolderName=None,
+            FolderParent=None,
+        )
 
-        # Add a Content-Type header to the response
-        response = JsonResponse({
+        response_data = {
             'success': True,
-            'node_domain': node_domain,
-            'ip_address': ip_address,
-            'date': date,
-        })
+        }
 
+        return JsonResponse(response_data, safe=False)
 
     else:
         print('method=get')

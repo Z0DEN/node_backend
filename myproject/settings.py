@@ -151,7 +151,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'MainApp.clouduser'
+AUTH_USER_MODEL = 'auth.User'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 
