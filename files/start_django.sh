@@ -1,7 +1,8 @@
 #!/bin/bash
 
 if [ -f "/certificate.crt" ]; then
-	set password=${CERTBOT_PASSWORD}
+	password=$CERTBOT_PASSWORD
+	echo $password
 	expect -c '
 	spawn python3 /node_backend/manage.py runsslserver --certificate /certificate.crt --key /django.key 0.0.0.0:8002
 	expect "Enter PEM pass phrase:"
