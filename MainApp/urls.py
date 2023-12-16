@@ -5,5 +5,6 @@ app_name = 'MainApp'
 
 urlpatterns = [
     path('AddUser/', views.AddUser, name='AddUser'),
+    path('test/', views.test, name='test'),
 ]
 
