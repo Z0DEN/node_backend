@@ -7,6 +7,16 @@ from .node_auth import node_connection
 
 global status_list
 
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+# (node_connection) add an update func if token was expired, add refresh token to headers if is was
+
 def RJR(status=False, msg=False):
     response_data = {
         "status": status if status else "Success, or not success, that is the question",
@@ -49,19 +59,26 @@ def AddUser(request):
 
 @csrf_exempt
 def test(request):
-    if request.method != 'POST':
-        return RJR(12)
+    return RJR(22)
 
-    bearer_header = request.headers.get('Authorization')
-
-    if not bearer_header or not bearer_header.startswith('Bearer '):
-        return RJR(16, "You need to produce token in authorization headers")
-
-    token = bearer_header.split(' ')[1]
-
-    print(token)
-    return RJR(20, f"You are genius as fuck: {token}")
     
+#    if request.method != 'POST':
+#        return RJR(12)
+#
+#    bearer_header = request.headers.get('Authorization')
+#
+#    if not bearer_header or not bearer_header.startswith('Bearer '):
+#        return RJR(16, "You need to produce token in authorization headers")
+#
+#    token = bearer_header.split(' ')[1]
+#
+#    print(token)
+#    return RJR(20, f"You are genius as fuck: {token}")
+
+
+@csrf_exempt
+def fail(request):
+   return RJR(15) 
 
 
     
