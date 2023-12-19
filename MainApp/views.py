@@ -30,36 +30,36 @@ def AddUser(request):
         return RJR(16, "You need to produce token in authorization headers")
 
     token = bearer_header.split(' ')[1]
-    
+    is_token_valid = server_data.objects.get(access_token=token)
+    if not is_token_valid:
+        return RJR(15)
 
-    new_user = main_user_model(
+    main_user_model.create(
             username = username,
     )
-    new_user.save()
     
-    new_user_data = user_data_model(
+    user_data_model.create(
         username=new_user,
         FolderName="None",
         FolderParent="None",
     )
-    new_user_data.save()
 
+    return RJR(21)
 
-    return JsonResponse(response_data, safe=False)
 
 @csrf_exempt
 def test(request):
     if request.method != 'POST':
         return RJR(12)
 
-
     bearer_header = request.headers.get('Authorization')
-    print(bearer_header)
 
     if not bearer_header or not bearer_header.startswith('Bearer '):
         return RJR(16, "You need to produce token in authorization headers")
 
     token = bearer_header.split(' ')[1]
+
+    print(token)
     return RJR(20, f"You are genius as fuck: {token}")
     
 

@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'MainApp.middleware.TokenAuthMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
