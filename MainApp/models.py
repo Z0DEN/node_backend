@@ -4,9 +4,9 @@ from django.contrib.auth.models import AbstractBaseUser
 
 class main_user_model(AbstractBaseUser):
     username = models.CharField(unique=True, max_length=255)
-    access_token = models.CharField(max_length=1024)
-    refresh_token = models.CharField(max_length=1024)
-    secret_key = models.CharField(max_length=64)
+    access_token = models.CharField(max_length=1024, default="access_token")
+    refresh_token = models.CharField(max_length=1024, default="refresh_token")
+    secret_key = models.CharField(max_length=64, default="secret_key")
 
 
 

@@ -1,45 +1,43 @@
-import json, requests, os, sys
+#import django
+#from django.conf import settings
 
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+#django.setup()
+
+from MainApp.models import server_data
+import os, requests, json
 
 def node_connection():
-    url1 = 'http://192.168.0.98:8005/NodeConnection/'
-    url2 = 'http://176.197.34.213:8005/NodeConnection/'
+    url1 = 'http://192.168.0.98:8001/NodeConnection/'
+    url2 = 'http://176.197.34.213:8001/NodeConnection/'
     headers = {'Content-Type': 'application/json'}
-    
+
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
     node_domain = os.environ.get('HOSTNAME')
     UUID = os.environ.get('UUID')
-    
-   # data = {
-   #     'node_domain': node_domain,
-   #     'IN_IP': IN_IP,
-   #     'EX_IP': EX_IP,
-   #     'UUID' : UUID,
-   #     'local_connection': True,
-   # }
 
     data = {
-        'node_domain': "testnodeconhsdfn",
-        'IN_IP': "12.61.25.23",
-        'EX_IP': "52.12.51.26",
-        'UUID' : "23c2t20vx73jz283vhrolsa",
+        'node_domain': node_domain,
+        'IN_IP': IN_IP,
+        'EX_IP': EX_IP,
+        'UUID' : UUID,
         'local_connection': True,
     }
 
     response = None
-    
+
     try:
         response = requests.post(url1, data=json.dumps(data), headers=headers)
     except requests.exceptions.RequestException:
          data["local_connection"] = False
          response = requests.post(url2, data=json.dumps(data), headers=headers)
-    
+
     if response == None:
         sys.exit()
         print("No response was received")
 
-    data = response.json() 
+    data = response.json()
 
     msg = data["msg"]
     status = data["status"]
@@ -51,4 +49,10 @@ def node_connection():
     elif status < 20:
         print(f"Failed to make connection: {status} \nmsg: {msg} \naccess_token: {access_token} \nrefresh_token: {refresh_token}")
 
-node_connection()
+    if status == 21 or status == 23:
+        server_data.objects.all().delete()
+        new_data = server_data(
+            main_server_access_token = access_token,
+            main_server_refresh_token = refresh_token
+        )
+        new_data.save()
