@@ -7,15 +7,6 @@ from .node_auth import node_connection
 
 global status_list
 
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
-# (node_connection) add an update func if token was expired, add refresh token to headers if is was
 
 def RJR(status=False, msg=False):
     response_data = {
@@ -27,28 +18,19 @@ def RJR(status=False, msg=False):
 
 @csrf_exempt
 def AddUser(request):
-    if request.method != 'POST':
-        return RJR(12) 
-
     username = request.POST['username']
-    bearer_header = request.headers.get('Authorization')
 
     if not username:
         return RJR(13)
-
-    if not bearer_header or not bearer_header.startswith('Bearer '):
-        return RJR(16, "You need to produce token in authorization headers")
-
-    token = bearer_header.split(' ')[1]
-    is_token_valid = server_data.objects.get(access_token=token)
-    if not is_token_valid:
-        return RJR(15)
-
-    main_user_model.create(
+    if main_user_model.objects.filter(username=username).exists():
+        return RJR(17)
+    
+    new_user = main_user_model(
             username = username,
     )
+    new_user.save()
     
-    user_data_model.create(
+    user_data_model.objects.create(
         username=new_user,
         FolderName="None",
         FolderParent="None",
@@ -61,19 +43,6 @@ def AddUser(request):
 def test(request):
     return RJR(22)
 
-    
-#    if request.method != 'POST':
-#        return RJR(12)
-#
-#    bearer_header = request.headers.get('Authorization')
-#
-#    if not bearer_header or not bearer_header.startswith('Bearer '):
-#        return RJR(16, "You need to produce token in authorization headers")
-#
-#    token = bearer_header.split(' ')[1]
-#
-#    print(token)
-#    return RJR(20, f"You are genius as fuck: {token}")
 
 
 @csrf_exempt
@@ -108,6 +77,7 @@ status_list = {
     14: "Token is expired. ",
     15: "Invalid Token. ",
     16: "Request have no auth token (Bearer). ",
+    17: "User already exist. ", 
     # ------------------------------------------------------------- #
     20: "Undefined success. ",
     21: "Node or user was successfully created. ",

@@ -2,6 +2,7 @@ from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.views import test, fail
+from MainApp.models import server_data, main_user_model, user_data_model
 
 
 global status_list
@@ -19,18 +20,20 @@ def RJR(status=False, msg=False):
 
 class TokenAuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
-#        if request.method != "POST":
-#            return RJR(12)
+        if request.method != "POST":
+            return RJR(12)
 
+        from_header = request.headers.get('from')
         bearer_header = request.headers.get('Authorization')
+        if not bearer_header or not bearer_header.startswith('Bearer '):
+            return RJR(16)
         token = bearer_header.split(' ')[1]
+        if from_header == 'server':
+            obj = server_data.objects.first()
+            local_token = getattr(obj, 'main_server_access_token')
+            if local_token != token:
+                return RJR(15)
 
-        if token == "token":
-            response = test(request)
-        else:
-            response = fail(request)
-
-        return response
 
 
 

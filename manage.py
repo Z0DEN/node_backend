@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-import os, json, requests, sys
-from django.conf import settings
+import json, requests, os, sys
+
 
 def main():
     """Run administrative tasks."""
@@ -14,12 +14,8 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-
-   # settings.configure()
     execute_from_command_line(sys.argv)
-    #from MainApp.node_conn import node_connection
-    #node_connection()
+
 
 if __name__ == '__main__':
     main()
-
