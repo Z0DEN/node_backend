@@ -23,15 +23,14 @@ def node_connection():
     url2 = 'http://176.197.34.213:8005/NodeConnection/'
     headers = {'Content-Type': 'application/json'}
 
+    node_domain = os.environ.get('HOSTNAME')
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
-    node_domain = os.environ.get('HOSTNAME')
     UUID = os.environ.get('UUID')
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
     access_expiration = issued_at + timedelta(minutes=100)
     refresh_expiration = issued_at + timedelta(hours=1)
-
 
     refresh_payload = {
         "sub": node_domain,
@@ -82,7 +81,7 @@ def node_connection():
     elif status < 20:
         print(f"Failed to make connection: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
 
-    if status == 21 or status == 23:
+    if status == 21:
         server_data.objects.all().delete()
         new_data = server_data(
             main_server_access_token = main_access_token,
