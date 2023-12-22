@@ -18,49 +18,6 @@ def decode_token(token, secret_key):
         return None, 15
 
 
-def update_token(obj):
-    upd_token_url1
-    refresh_token = getattr(obj, 'local_refresh_token')
-    data_to_send = get_data()
-
-    data_to_send['node_domain'] = None
-    data_to_send['IN_IP'] = None
-    data_to_send['EX_IP'] = None
-    data_to_send['local_connection'] = None
-
-    response = None
-
-    try:
-        response = requests.post(upd_token_url1, data=json.dumps(data_to_send), headers=headers)
-    except requests.exceptions.RequestException:
-         data_to_send["local_connection"] = False
-         response = requests.post(upd_token_url2, data=json.dumps(data_to_send), headers=headers)
-         
-    if response == None:
-        print("No response was received")
-        return
-
-    response_data = response.json()
-    
-    msg = response_data["msg"]
-    status = response_data["status"]
-    main_access_token = response_data["access_token"]
-    main_refresh_token = response_data["refresh_token"]
-    
-    if status >= 20 and status < 30:
-        print(f"Success: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
-    elif status < 20:
-        print(f"Failed to make connection: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
-    
-    if status == 21:
-        obj.main_server_access_token = main_access_token,
-        obj.main_server_refresh_token = main_refresh_token,
-        obj.local_server_access_token =  data_to_send["local_access_token"],
-        obj.local_server_refresh_token = data_to_send["local_refresh_token"],
-        obj.secret_key = secret_key
-        obj.save()
-
-
 def get_data():
     node_domain = os.environ.get('HOSTNAME')
     IN_IP = os.environ.get('IN_IP')
@@ -102,11 +59,12 @@ def get_data():
 def send_data(data_to_send):
     try:
          obj = server_data.objects.first()
-         access_token = getattr(obj, 'local_access_token')
-         refresh_token = getattr(obj, 'local_refresh_token')
-         _, status = decode(
+         secret_key = getattr(obj, 'secret_key')
+         access_token = getattr(obj, 'local_server_access_token')
+         refresh_token = getattr(obj, 'local_server_refresh_token')
+         _, status = decode_token(access_token, secret_key)
          if status == 14:
-             headers['Authorizatoin'] = 'Bearer ' + refresh_token
+             headers['Authorization'] = 'Bearer ' + refresh_token
     except obj.DoesNotExist:
         pass
 
@@ -118,8 +76,8 @@ def send_data(data_to_send):
     return response
 
 
-url1 = 'http://192.168.0.98:8001/NodeConnection/'
-url2 = 'http://176.197.34.213:8001/NodeConnection/'
+url1 = 'http://192.168.0.98:8005/NodeConnection/'
+url2 = 'http://176.197.34.213:8005/NodeConnection/'
 headers = {'Content-Type': 'application/json'}
 
 
