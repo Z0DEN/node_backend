@@ -7,6 +7,8 @@ from .node_auth import node_connection
 
 global status_list
 
+def gen_secret_key():
+    return secrets.token_hex(32)
 
 def RJR(status=False, msg=False):
     response_data = {
@@ -24,9 +26,31 @@ def AddUser(request):
         return RJR(13)
     if main_user_model.objects.filter(username=username).exists():
         return RJR(17)
-    
+
+    secret_key = gen_secret_key()
+
+    refresh_payload = {
+        "sub": username,
+        "exp": refresh_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+
+    access_payload = {
+        "sub": username,
+        "exp": access_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+
+    user_a_token = generate_token(access_payload, secret_key)
+    user_ref_token = generate_token(refresh_payload, secret_key) 
+
     new_user = main_user_model(
             username = username,
+            user_access_token = user_a_token, 
+            user_refresh_token = user_ref_token, 
+            secret_key = secret_key, 
     )
     new_user.save()
     

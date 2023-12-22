@@ -25,12 +25,13 @@ class TokenAuthMiddleware(MiddlewareMixin):
 
         from_header = request.headers.get('from')
         bearer_header = request.headers.get('Authorization')
+
         if not bearer_header or not bearer_header.startswith('Bearer '):
             return RJR(16)
         token = bearer_header.split(' ')[1]
         if from_header == 'server':
             obj = server_data.objects.first()
-            local_token = getattr(obj, 'main_server_access_token')
+            local_token = getattr(obj, 'local_access_token')
             if local_token != token:
                 return RJR(15)
 
