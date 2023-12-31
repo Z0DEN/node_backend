@@ -28,14 +28,17 @@ def get_data():
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
     access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(days=7)
     
     refresh_payload = {
         "sub": node_domain,
+        "exp": refresh_expiration,
         "iat": issued_at,
     }
     
     access_payload = {
         "sub": node_domain,
+        "exp": access_expiration,
         "iat": issued_at,
     }
     
