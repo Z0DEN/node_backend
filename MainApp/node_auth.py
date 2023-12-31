@@ -2,7 +2,7 @@ from MainApp.models import server_data
 import os, requests, json, jwt, secrets, datetime
 from datetime import datetime, timedelta
 
-private_key = "private_key"
+personal_key = "personal_key"
 
 def generate_token(payload, secret_key):
     token = jwt.encode(payload, secret_key, algorithm="HS256")
@@ -24,7 +24,6 @@ def get_data():
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
     UUID = os.environ.get('UUID')
-    print(node_domain, IN_IP, EX_IP, UUID)
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
@@ -61,14 +60,20 @@ def send_data(data_to_send):
         secret_key = getattr(obj, 'secret_key')
         local_access_token = getattr(obj, 'local_server_access_token')
         _, status = decode_token(local_access_token, secret_key)
+
         if status == 22:
-            access_token = getattr(obj, 'main_server_access_token')
-            headers['Authorization'] = 'access ' + access_token 
+            main_access_token = getattr(obj, 'main_server_access_token')
+            headers['Authorization'] = 'access ' + main_access_token 
         elif status == 14:
-            refresh_token = getattr(obj, 'main_server_refresh_token')
-            headers['Authorization'] = 'refresh ' + refresh_token
+            local_refresh_token = getattr(obj, 'local_server_refresh_token')
+            _, status = decode_token(local_refresh_token, secret_key)
+            if status == 22:
+                main_refresh_token = getattr(obj, 'main_server_refresh_token')
+                headers['Authorization'] = 'refresh ' + main_refresh_token
+            else:
+                headers['Authorization'] = 'personal ' + personal_key
     else:
-        headers['Authorization'] = 'private ' + private_key
+        headers['Authorization'] = 'personal ' + personal_key
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
@@ -116,7 +121,7 @@ def node_connection():
         )
         new_data.save()
 
-    if status == 22:
+    if status == 23:
          obj = server_data.objects.first()
          data_to_update = {
              'main_server_access_token': main_access_token,
