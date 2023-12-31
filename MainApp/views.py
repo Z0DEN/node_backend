@@ -66,6 +66,7 @@ def AddUser(request):
 @csrf_exempt
 def test(request):
     return RJR(22)
+#hello_world
 
 
 

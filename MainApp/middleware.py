@@ -1,3 +1,4 @@
+import jwt
 from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
@@ -16,6 +17,17 @@ def RJR(status=False, msg=False):
     }
     return JsonResponse(response_data)
 
+
+def decode_token(token, secret_key):
+    try:
+        decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
+        return decoded, 22
+    except jwt.ExpiredSignatureError:
+        return None, 14
+    except jwt.InvalidTokenError:
+        return None, 15
+
+
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 class TokenAuthMiddleware(MiddlewareMixin):
@@ -29,11 +41,15 @@ class TokenAuthMiddleware(MiddlewareMixin):
         if not bearer_header or not bearer_header.startswith('Bearer '):
             return RJR(16)
         token = bearer_header.split(' ')[1]
+
         if from_header == 'server':
             obj = server_data.objects.first()
-            local_token = getattr(obj, 'local_access_token')
-            if local_token != token:
-                return RJR(15)
+            secret_key = getattr(obj, 'secret_key')
+            _, status = decode_token(token, secret_key)
+            print('token: ', token, '\n')
+            print('secret_key:', secret_key)
+            if status != 22:
+                return RJR(status)
 
 
 

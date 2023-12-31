@@ -86,8 +86,8 @@ def send_data(data_to_send):
     return response
 
 
-url1 = 'http://192.168.0.98:8005/NodeConnection/'
-url2 = 'http://176.197.34.213:8005/NodeConnection/'
+url1 = 'http://192.168.0.98:8001/NodeConnection/'
+url2 = 'http://176.197.34.213:8001/NodeConnection/'
 headers = {'Content-Type': 'application/json'}
 
 
