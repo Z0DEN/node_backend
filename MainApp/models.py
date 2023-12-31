@@ -24,4 +24,4 @@ class server_data(models.Model):
     main_server_refresh_token = models.CharField(unique=True, max_length=1024)
     local_server_access_token = models.CharField(unique=True, max_length=1024)
     local_server_refresh_token = models.CharField(unique=True, max_length=1024)
-    date_added = models.DateTimeField(auto_now_add=True, auto_now=True)
+    date_added = models.DateTimeField(auto_now=True)
