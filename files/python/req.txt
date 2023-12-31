@@ -1,6 +1,7 @@
 asgiref
 Brotli
 browser-cookie3
+jwt
 certbot
 PyQt5
 certbot-nginx
