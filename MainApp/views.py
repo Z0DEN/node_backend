@@ -1,4 +1,4 @@
-import datetime
+import datetime, secrets
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -27,30 +27,9 @@ def AddUser(request):
     if main_user_model.objects.filter(username=username).exists():
         return RJR(17)
 
-    secret_key = gen_secret_key()
-
-    refresh_payload = {
-        "sub": username,
-        "exp": refresh_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    access_payload = {
-        "sub": username,
-        "exp": access_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    user_a_token = generate_token(access_payload, secret_key)
-    user_ref_token = generate_token(refresh_payload, secret_key) 
 
     new_user = main_user_model(
             username = username,
-            user_access_token = user_a_token, 
-            user_refresh_token = user_ref_token, 
-            secret_key = secret_key, 
     )
     new_user.save()
     

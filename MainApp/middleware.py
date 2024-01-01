@@ -35,19 +35,18 @@ class TokenAuthMiddleware(MiddlewareMixin):
         if request.method != "POST":
             return RJR(12)
 
-        from_header = request.headers.get('from')
         bearer_header = request.headers.get('Authorization')
 
-        if not bearer_header or not bearer_header.startswith('Bearer '):
+        if not bearer_header:
             return RJR(16)
-        token = bearer_header.split(' ')[1]
 
-        if from_header == 'server':
+        token = bearer_header.split(' ')[1]
+        header_type = bearer_header.split(' ')[0]
+
+        if header_type == 'server':
             obj = server_data.objects.first()
             secret_key = getattr(obj, 'secret_key')
             _, status = decode_token(token, secret_key)
-            print('token: ', token, '\n')
-            print('secret_key:', secret_key)
             if status != 22:
                 return RJR(status)
 
