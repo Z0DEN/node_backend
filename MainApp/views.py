@@ -48,12 +48,6 @@ def test(request):
 #hello_world
 
 
-
-@csrf_exempt
-def fail(request):
-   return RJR(15) 
-
-
     
 
 # --------------------------------------------------- #

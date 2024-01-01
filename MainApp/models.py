@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
 
-class main_user_model(AbstractBaseUser):
+class main_user_model(models.Model):
     username = models.CharField(unique=True, max_length=255)
     user_access_token = models.CharField(max_length=1024, default="access_token")
     user_refresh_token = models.CharField(max_length=1024, default="refresh_token")
