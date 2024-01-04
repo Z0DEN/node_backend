@@ -156,28 +156,28 @@ AUTH_USER_MODEL = 'auth.User'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 
-LOGGING = {
-   'version': 1,
-   'disable_existing_loggers': False,
-   'handlers': {
-       'console': {
-           'class': 'logging.StreamHandler',
-       },
-       'file': {
-           'level': 'DEBUG',
-           'class': 'logging.FileHandler',
-           'filename': '/var/log/django/debug.log',
-       },
-   },
-   'root': {
-       'handlers': ['console', 'file'],
-       'level': 'INFO',
-   },
-   'loggers': {
-       'django': {
-           'handlers': ['console', 'file'],
-           'level': 'DEBUG',
-           'propagate': True,
-       },
-   },
-}
+#LOGGING = {
+#   'version': 1,
+#   'disable_existing_loggers': False,
+#   'handlers': {
+#       'console': {
+#           'class': 'logging.StreamHandler',
+#       },
+#       'file': {
+#           'level': 'DEBUG',
+#           'class': 'logging.FileHandler',
+#           'filename': '/var/log/django/debug.log',
+#       },
+#   },
+#   'root': {
+#       'handlers': ['console', 'file'],
+#       'level': 'INFO',
+#   },
+#   'loggers': {
+#       'django': {
+#           'handlers': ['console', 'file'],
+#           'level': 'DEBUG',
+#           'propagate': True,
+#       },
+#   },
+#}
