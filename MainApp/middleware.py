@@ -3,6 +3,7 @@ from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.views import test
+from django.core.cache import cache
 from MainApp.models import server_data, main_user_model, user_data_model
 
 
@@ -44,18 +45,17 @@ class TokenAuthMiddleware(MiddlewareMixin):
         header_type = bearer_header.split(' ')[0]
 
         if header_type == 'server':
-            obj = server_data.objects.first()
-            secret_key = getattr(obj, 'secret_key')
-            _, status = decode_token(token, secret_key)
-            if status != 22:
-                return RJR(status)
+            secret_key = cache.get('main_server_secret_key')
+        elif header_type == 'user':
+            secret_key = 'secret_key'
+
+
+        _, status = decode_token(token, secret_key)
+        return RJR(status) if status != 22
 
 
 
 
-
-
-# ------------------------------------------------------------- #
 #                            STATUSES                           #
 # ------------------------------------------------------------- #
 #   1<..>  -> Error

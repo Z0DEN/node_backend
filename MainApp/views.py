@@ -4,11 +4,10 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from MainApp.models import main_user_model, user_data_model, server_data 
 from .node_auth import node_connection
+from .tokens import *
 
 global status_list
 
-def gen_secret_key():
-    return secrets.token_hex(32)
 
 def RJR(status=False, msg=False):
     response_data = {

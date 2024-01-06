@@ -1,6 +1,7 @@
 from MainApp.models import server_data
 import os, requests, json, jwt, secrets, datetime
 from datetime import datetime, timedelta
+from django.core.cache import cache
 
 personal_key = "personal_key"
 
@@ -123,14 +124,19 @@ def node_connection():
             secret_key = secret_key
         )
         new_data.save()
+        secret_key = server_data.objects.first().secret_key
+        cache.set('main_server_secret_key', secret_key, None)
+
 
     if status == 23:
-         obj = server_data.objects.first()
-         data_to_update = {
-             'main_server_access_token': main_access_token,
-             'main_server_refresh_token': main_refresh_token,
-             'local_server_access_token': local_access_token,
-             'local_server_refresh_token': local_refresh_token,
-             'secret_key': secret_key,
-         }
-         server_data.objects.filter(id=obj.id).update(**data_to_update)
+        obj = server_data.objects.first()
+        data_to_update = {
+            'main_server_access_token': main_access_token,
+            'main_server_refresh_token': main_refresh_token,
+            'local_server_access_token': local_access_token,
+            'local_server_refresh_token': local_refresh_token,
+            'secret_key': secret_key,
+        }
+        server_data.objects.filter(id=obj.id).update(**data_to_update)
+        secret_key = server_data.objects.first().secret_key
+        cache.set('main_server_secret_key', secret_key, None)
