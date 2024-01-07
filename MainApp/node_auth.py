@@ -1,7 +1,10 @@
+import os, requests, json, jwt, secrets, datetime, redis
 from MainApp.models import server_data
-import os, requests, json, jwt, secrets, datetime
 from datetime import datetime, timedelta
 from django.core.cache import cache
+
+RPASSWORD = os.environ.get('RPASSWORD')
+REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD db=0)
 
 personal_key = "personal_key"
 
@@ -125,8 +128,7 @@ def node_connection():
         )
         new_data.save()
         secret_key = server_data.objects.first().secret_key
-        cache.set('main_server_secret_key', secret_key, None)
-
+        REDISKA.setex('server_secret_key', 6000, secret_key)
 
     if status == 23:
         obj = server_data.objects.first()
@@ -139,4 +141,4 @@ def node_connection():
         }
         server_data.objects.filter(id=obj.id).update(**data_to_update)
         secret_key = server_data.objects.first().secret_key
-        cache.set('main_server_secret_key', secret_key, None)
+        REDISKA.setex('server_secret_key', 6000, secret_key)

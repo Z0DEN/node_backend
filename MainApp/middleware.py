@@ -1,20 +1,25 @@
 import jwt
+import os
+import redis
 from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.views import test
-from django.core.cache import cache
 from MainApp.models import server_data, main_user_model, user_data_model
 
+# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
-global status_list
+global STATUS_LIST, REDISKA
+
+RPASSWORD = os.environ.get('RPASSWORD')
+REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD db=0)
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 def RJR(status=False, msg=False):
     response_data = {
         "status": status if status else "Success, or not success, that is the question",
-        "msg": status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???",
+        "msg": STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "???UNDEFINED ERROR???",
     }
     return JsonResponse(response_data)
 
@@ -45,13 +50,13 @@ class TokenAuthMiddleware(MiddlewareMixin):
         header_type = bearer_header.split(' ')[0]
 
         if header_type == 'server':
-            secret_key = cache.get('main_server_secret_key')
+            secret_key = REDISKA.get('server_secret_key')
+            secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil'
+            _, status = decode_token(token, secret_key)
+            RJR(status) if status != 22
         elif header_type == 'user':
             secret_key = 'secret_key'
 
-
-        _, status = decode_token(token, secret_key)
-        return RJR(status) if status != 22
 
 
 
@@ -63,7 +68,7 @@ class TokenAuthMiddleware(MiddlewareMixin):
 #   3<..>  -> Warning
 #   4<..>  -> Info
 
-status_list = {
+STATUS_LIST = {
     10: "Undefined error. ",
     11: "Node already exists. ",
     12: "Invalid request method. ",
