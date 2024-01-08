@@ -89,8 +89,8 @@ def send_data(data_to_send, token_type='None'):
             return send_data(data_to_send)
 
 
-url1 = 'http://192.168.0.98:8001/NodeConnection/'
-url2 = 'http://176.197.34.213:8001/NodeConnection/'
+url1 = 'http://192.168.0.98:8005/NodeConnection/'
+url2 = 'http://176.197.34.213:8005/NodeConnection/'
 headers = {'Content-Type': 'application/json'}
 
 
@@ -129,7 +129,6 @@ def node_connection():
         }
         server_data.objects.filter(id=obj.id).update(**data_to_update)
         REDISKA.setex('server_secret_key', 6000, secret_key)
-
 
 
 #def UpdateNodeTokens(local_connection=None, request=None):
