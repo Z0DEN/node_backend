@@ -2,9 +2,10 @@ import os, requests, json, jwt, secrets, datetime, redis
 from MainApp.models import server_data
 from datetime import datetime, timedelta
 from django.core.cache import cache
+from .tokens import *
 
 RPASSWORD = os.environ.get('RPASSWORD')
-REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD db=0)
+REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
 personal_key = "personal_key"
 
@@ -61,33 +62,31 @@ def get_data():
     return local_access_token, local_refresh_token, secret_key, data
 
 
-def send_data(data_to_send):
-    obj = server_data.objects.first()
-    if obj is not None:
-        secret_key = getattr(obj, 'secret_key')
-        local_access_token = getattr(obj, 'local_server_access_token')
-        _, status = decode_token(local_access_token, secret_key)
-
-        if status == 22:
-            main_access_token = getattr(obj, 'main_server_access_token')
-            headers['Authorization'] = 'access ' + main_access_token 
-        elif status == 14:
-            local_refresh_token = getattr(obj, 'local_server_refresh_token')
-            _, status = decode_token(local_refresh_token, secret_key)
-            if status == 22:
-                main_refresh_token = getattr(obj, 'main_server_refresh_token')
-                headers['Authorization'] = 'refresh ' + main_refresh_token
-            else:
-                headers['Authorization'] = 'personal ' + personal_key
+def send_data(data_to_send, token_type='None'):
+    token = server_data.objects.first().token_type
+    if token is not None:
+        headers['Authorization'] = f'token_type ' + token 
     else:
         headers['Authorization'] = 'personal ' + personal_key
+
+    print(token_type, token)
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
     except requests.exceptions.RequestException:
          data_to_send["local_connection"] = False
          response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
-    return response
+
+    data = response.json()
+    status = data["status"]
+
+    if status == 22 or status == 23 or status == 21:
+        return data
+    elif status == 14:
+        if token_type != 'main_server_refresh_token':
+            return send_data(data_to_send, 'main_server_refresh_token')
+        else:
+            return send_data(data_to_send)
 
 
 url1 = 'http://192.168.0.98:8001/NodeConnection/'
@@ -100,18 +99,12 @@ def node_connection():
     
     response = None
     
-    response = send_data(data_to_send) 
+    response_data = send_data(data_to_send, 'main_server_access_token') 
     
-    if response == None:
-        print("No response was received")
-        return
-    
-    data = response.json()
-    
-    msg = data["msg"]
-    status = data["status"]
-    main_access_token = data["access_token"]
-    main_refresh_token = data["refresh_token"]
+    msg = response_data["msg"]
+    status = response_data["status"]
+    main_access_token = response_data["access_token"]
+    main_refresh_token = response_data["refresh_token"]
     
     if status >= 20 and status < 30:
         print(f"Success: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
@@ -122,12 +115,9 @@ def node_connection():
         new_data = server_data(
             main_server_access_token = main_access_token,
             main_server_refresh_token = main_refresh_token,
-            local_server_access_token =  local_access_token,
-            local_server_refresh_token = local_refresh_token,
             secret_key = secret_key
         )
         new_data.save()
-        secret_key = server_data.objects.first().secret_key
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
     if status == 23:
@@ -135,10 +125,11 @@ def node_connection():
         data_to_update = {
             'main_server_access_token': main_access_token,
             'main_server_refresh_token': main_refresh_token,
-            'local_server_access_token': local_access_token,
-            'local_server_refresh_token': local_refresh_token,
             'secret_key': secret_key,
         }
         server_data.objects.filter(id=obj.id).update(**data_to_update)
-        secret_key = server_data.objects.first().secret_key
         REDISKA.setex('server_secret_key', 6000, secret_key)
+
+
+
+#def UpdateNodeTokens(local_connection=None, request=None):

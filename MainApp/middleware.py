@@ -12,7 +12,7 @@ from MainApp.models import server_data, main_user_model, user_data_model
 global STATUS_LIST, REDISKA
 
 RPASSWORD = os.environ.get('RPASSWORD')
-REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD db=0)
+REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
