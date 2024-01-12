@@ -63,13 +63,16 @@ def get_data():
 
 
 def send_data(data_to_send, token_type='None'):
-    token = server_data.objects.first().token_type
-    if token is not None:
-        headers['Authorization'] = f'token_type ' + token 
+#    print(token_type)
+    obj = server_data.objects.first()
+
+    if obj is not None and token_type != 'None': 
+        token = getattr(obj, token_type)
+        headers['Authorization'] = f'{token_type} ' + token 
     else:
         headers['Authorization'] = 'personal ' + personal_key
 
-    print(token_type, token)
+#    print(token_type, token)
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
@@ -78,15 +81,20 @@ def send_data(data_to_send, token_type='None'):
          response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
 
     data = response.json()
+    print('\n\n', 'current token_type: ', token_type)
     status = data["status"]
+#    print('\n\n', 'current token_type: ', token_type, '  status: ', status, '\n\n')
 
     if status == 22 or status == 23 or status == 21:
         return data
-    elif status == 14:
-        if token_type != 'main_server_refresh_token':
-            return send_data(data_to_send, 'main_server_refresh_token')
-        else:
-            return send_data(data_to_send)
+    elif status == 14: 
+        print('\n\n start sending refresh', token_type, '\n\n')
+        resp_send_data = send_data(data_to_send, 'main_server_refresh_token')
+#        print(resp_send_data)
+        return resp_send_data 
+    elif status == 14 and token_type == 'main_server_refresh_token':
+        print('\n\n', token_type, '\n\n')
+        return send_data(data_to_send, 'None')
 
 
 url1 = 'http://192.168.0.98:8005/NodeConnection/'
