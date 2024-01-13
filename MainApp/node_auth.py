@@ -32,8 +32,8 @@ def get_data():
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=100)
-    refresh_expiration = issued_at + timedelta(days=7)
+    access_expiration = issued_at + timedelta(minutes=30)
+    refresh_expiration = issued_at + timedelta(days=5)
     
     refresh_payload = {
         "sub": node_domain,
@@ -130,5 +130,9 @@ def node_connection():
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-#def UpdateNodeTokens(local_connection=None, request=None):
+def UpdateNodeTokens():
+    
+
+
+
 node_connection()
