@@ -62,39 +62,52 @@ def get_data():
     return local_access_token, local_refresh_token, secret_key, data
 
 
-def send_data(data_to_send, token_type='None'):
-#    print(token_type)
+class RefreshException(Exception):
+    pass
+
+
+def main_func(data_to_send, token_type='None'):
     obj = server_data.objects.first()
 
     if obj is not None and token_type != 'None': 
+        token_type_split = token_type.split('_')[-2]
+        print(token_type_split)
         token = getattr(obj, token_type)
-        headers['Authorization'] = f'{token_type} ' + token 
+        headers['Authorization'] = f'{token_type_split} ' + token 
     else:
         headers['Authorization'] = 'personal ' + personal_key
-
-#    print(token_type, token)
+        print('personal key')
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
     except requests.exceptions.RequestException:
-         data_to_send["local_connection"] = False
-         response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
+        data_to_send["local_connection"] = False
+        response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
 
     data = response.json()
-    print('\n\n', 'current token_type: ', token_type)
     status = data["status"]
-#    print('\n\n', 'current token_type: ', token_type, '  status: ', status, '\n\n')
+    print('\n\n', 'current token_type: ', token_type, '\n  data: ', data, '\n\n')
 
     if status == 22 or status == 23 or status == 21:
         return data
-    elif status == 14: 
-        print('\n\n start sending refresh', token_type, '\n\n')
-        resp_send_data = send_data(data_to_send, 'main_server_refresh_token')
-#        print(resp_send_data)
-        return resp_send_data 
-    elif status == 14 and token_type == 'main_server_refresh_token':
-        print('\n\n', token_type, '\n\n')
-        return send_data(data_to_send, 'None')
+    else:
+        raise RefreshException
+
+
+
+def send_data(data_to_send):
+    try:
+        print('start first time (access)')
+        response_data = main_func(data_to_send, 'main_server_access_token')
+    except RefreshException:
+        try:
+            print('start second time (refresh)')
+            response_data = main_func(data_to_send, 'main_server_refresh_token')
+        except RefreshException:
+            print('start third time (personal key)')
+            response_data = main_func(data_to_send, 'None')
+    return response_data
+
 
 
 url1 = 'http://192.168.0.98:8005/NodeConnection/'
@@ -107,7 +120,9 @@ def node_connection():
     
     response = None
     
-    response_data = send_data(data_to_send, 'main_server_access_token') 
+#    response_data, status = send_data(data_to_send, 'main_server_access_token') 
+
+    response_data = send_data(data_to_send) 
     
     msg = response_data["msg"]
     status = response_data["status"]
@@ -140,3 +155,4 @@ def node_connection():
 
 
 #def UpdateNodeTokens(local_connection=None, request=None):
+node_connection()
