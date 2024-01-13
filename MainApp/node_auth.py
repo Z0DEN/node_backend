@@ -66,17 +66,19 @@ class RefreshException(Exception):
     pass
 
 
-def main_func(data_to_send, token_type='None'):
+def main_func(data_to_send, call_func, token_type='None'):
+    url1 = f'http://192.168.0.98:8005/{call_func}/'
+    url2 = f'http://176.197.34.213:8005/{call_func}/'
+    headers = {'Content-Type': 'application/json'}
+
     obj = server_data.objects.first()
 
     if obj is not None and token_type != 'None': 
         token_type_split = token_type.split('_')[-2]
-        print(token_type_split)
         token = getattr(obj, token_type)
         headers['Authorization'] = f'{token_type_split} ' + token 
     else:
         headers['Authorization'] = 'personal ' + personal_key
-        print('personal key')
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
@@ -86,7 +88,6 @@ def main_func(data_to_send, token_type='None'):
 
     data = response.json()
     status = data["status"]
-    print('\n\n', 'current token_type: ', token_type, '\n  data: ', data, '\n\n')
 
     if status == 22 or status == 23 or status == 21:
         return data
@@ -95,34 +96,23 @@ def main_func(data_to_send, token_type='None'):
 
 
 
-def send_data(data_to_send):
+def send_data(data_to_send, call_func):
     try:
-        print('start first time (access)')
-        response_data = main_func(data_to_send, 'main_server_access_token')
+        response_data = main_func(data_to_send, call_func, 'main_server_access_token')
     except RefreshException:
         try:
-            print('start second time (refresh)')
-            response_data = main_func(data_to_send, 'main_server_refresh_token')
+            response_data = main_func(data_to_send, call_func, 'main_server_refresh_token')
         except RefreshException:
-            print('start third time (personal key)')
-            response_data = main_func(data_to_send, 'None')
+            response_data = main_func(data_to_send, call_func, 'None')
     return response_data
-
-
-
-url1 = 'http://192.168.0.98:8005/NodeConnection/'
-url2 = 'http://176.197.34.213:8005/NodeConnection/'
-headers = {'Content-Type': 'application/json'}
 
 
 def node_connection():
     local_access_token, local_refresh_token, secret_key, data_to_send = get_data()
     
     response = None
-    
-#    response_data, status = send_data(data_to_send, 'main_server_access_token') 
 
-    response_data = send_data(data_to_send) 
+    response_data = send_data(data_to_send, 'NodeConnection') 
     
     msg = response_data["msg"]
     status = response_data["status"]
@@ -155,4 +145,7 @@ def node_connection():
 
 
 #def UpdateNodeTokens(local_connection=None, request=None):
+
+
+
 node_connection()

@@ -51,9 +51,9 @@ class TokenAuthMiddleware(MiddlewareMixin):
 
         if header_type == 'server':
             secret_key = REDISKA.get('server_secret_key')
-            secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil'
+            secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil' else secret_key
             _, status = decode_token(token, secret_key)
-            RJR(status) if status != 22
+            RJR(status) if status != 22 else None
         elif header_type == 'user':
             secret_key = 'secret_key'
 
