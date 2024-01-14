@@ -9,6 +9,16 @@ REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
 personal_key = "personal_key"
 
+global status_list
+
+def RJR(response_data={}, status=False, msg=False):
+    response_data = {
+        "status": status if status else "Success, or not success, that is the question",
+        "msg": status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???",
+    }
+    return JsonResponse(response_data)
+
+
 def generate_token(payload, secret_key):
     token = jwt.encode(payload, secret_key, algorithm="HS256")
     return token
@@ -32,8 +42,10 @@ def get_data():
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=30)
-    refresh_expiration = issued_at + timedelta(days=5)
+    #access_expiration = issued_at + timedelta(minutes=30)
+    #refresh_expiration = issued_at + timedelta(days=5)
+    access_expiration = issued_at + timedelta(minutes=1)
+    refresh_expiration = issued_at + timedelta(minutes=3)
     
     refresh_payload = {
         "sub": node_domain,
@@ -109,7 +121,33 @@ def node_connection():
         print(f"Success: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
     elif status < 20:
         print(f"Failed to make connection: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
+        return
+
+    UpdateLocalTokens(main_access_token, main_refresh_token, secret_key, status)
+
+
+def UpdateNodeTokens(request):
+    data = json.loads(request.body)
+    main_server_access_token = data["access_token"]
+    main_server_refresh_token = data["refresh_token"]
+
+    if (
+        main_server_access_token is None
+        or  main_server_refresh_token is None
+    ):
+        RJR(13)
     
+    local_access_token, local_refresh_token, secret_key, _ = get_data()
+    resp_data ={
+        'access_token':  local_access_token,
+        'refresh_token':  local_refresh_token
+    }
+    print('updating')
+    UpdateLocalTokens(local_access_token, local_refresh_token, secret_key, 23)
+    RJR(response_data=resp_data,status=23)
+
+     
+def UpdateLocalTokens(main_access_token, main_refresh_token, secret_key, status):
     if status == 21:
         new_data = server_data(
             main_server_access_token = main_access_token,
@@ -130,9 +168,25 @@ def node_connection():
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-def UpdateNodeTokens():
-    
-
-
-
 node_connection()
+
+
+status_list = {
+    10: "Undefined error. ",
+    11: "Node already exists. ",
+    12: "Invalid request method. ",
+    13: "Invalid request data. ",
+    14: "Token is expired. ",
+    15: "Invalid Token. ",
+    16: "Request have no auth token (Bearer). ",
+    17: "User already exist. ", 
+    # ------------------------------------------------------------- #
+    20: "Undefined success. ",
+    21: "Node or user was successfully created. ",
+    22: "Token is Valid. ",
+    23: "Data successfully changed. ",
+    # ------------------------------------------------------------- #
+    30: "Undefined warning. ",
+    # ------------------------------------------------------------- #
+    40: "Undefined info. ",
+}

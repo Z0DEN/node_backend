@@ -32,8 +32,8 @@ def get_data():
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=100)
-    refresh_expiration = issued_at + timedelta(days=7)
+    access_expiration = issued_at + timedelta(minutes=30)
+    refresh_expiration = issued_at + timedelta(days=5)
     
     refresh_payload = {
         "sub": node_domain,
@@ -62,57 +62,43 @@ def get_data():
     return local_access_token, local_refresh_token, secret_key, data
 
 
-class RefreshException(Exception):
-    pass
-
-
-def main_func(data_to_send, call_func, token_type='None'):
-    url1 = f'http://192.168.0.98:8005/{call_func}/'
-    url2 = f'http://176.197.34.213:8005/{call_func}/'
-    headers = {'Content-Type': 'application/json'}
-
+def send_data(data_to_send, token_type='main_server_access_token'):
     obj = server_data.objects.first()
 
     if obj is not None and token_type != 'None': 
-        token_type_split = token_type.split('_')[-2]
         token = getattr(obj, token_type)
-        headers['Authorization'] = f'{token_type_split} ' + token 
+        headers['Authorization'] = f'Bearer ' + token 
     else:
         headers['Authorization'] = 'personal ' + personal_key
 
     try:
         response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
     except requests.exceptions.RequestException:
-        data_to_send["local_connection"] = False
-        response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
+         data_to_send["local_connection"] = False
+         response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
 
     data = response.json()
     status = data["status"]
 
     if status == 22 or status == 23 or status == 21:
         return data
+    elif status == 14 and token_type != 'main_server_refresh_token': 
+        return send_data(data_to_send, 'main_server_refresh_token')
     else:
-        raise RefreshException
+        return send_data(data_to_send, 'None')
 
 
-
-def send_data(data_to_send, call_func):
-    try:
-        response_data = main_func(data_to_send, call_func, 'main_server_access_token')
-    except RefreshException:
-        try:
-            response_data = main_func(data_to_send, call_func, 'main_server_refresh_token')
-        except RefreshException:
-            response_data = main_func(data_to_send, call_func, 'None')
-    return response_data
+url1 = 'http://192.168.0.98:8005/NodeConnection/'
+url2 = 'http://176.197.34.213:8005/NodeConnection/'
+headers = {'Content-Type': 'application/json'}
 
 
 def node_connection():
     local_access_token, local_refresh_token, secret_key, data_to_send = get_data()
     
     response = None
-
-    response_data = send_data(data_to_send, 'NodeConnection') 
+    
+    response_data = send_data(data_to_send) 
     
     msg = response_data["msg"]
     status = response_data["status"]
@@ -144,7 +130,8 @@ def node_connection():
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-#def UpdateNodeTokens(local_connection=None, request=None):
+def UpdateNodeTokens(request):
+    
 
 
 

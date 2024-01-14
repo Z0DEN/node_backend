@@ -6,5 +6,5 @@ app_name = 'MainApp'
 urlpatterns = [
     path('AddUser/', views.AddUser, name='AddUser'),
     path('test/', views.test, name='test'),
-#    path('UpdateNodeTokens/', node_auth.UpdateNodeTokens),
+    path('UpdateNodeTokens/', node_auth.UpdateNodeTokens),
 ]
