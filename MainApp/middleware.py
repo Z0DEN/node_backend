@@ -46,14 +46,19 @@ class TokenAuthMiddleware(MiddlewareMixin):
         if not bearer_header:
             return RJR(16)
 
-        token = bearer_header.split(' ')[1]
-        header_type = bearer_header.split(' ')[0]
+        token = bearer_header.split(' ')[2]
+        header_type = bearer_header.split(' ')[1]
+        from_header = bearer_header.split(' ')[0]
 
-        if header_type == 'server':
-            secret_key = REDISKA.get('server_secret_key')
-            secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil' else secret_key
-            _, status = decode_token(token, secret_key)
-            RJR(status) if status != 22 else None
+        if from_header == 'server':
+            if header_type == 'personal':
+                secret_key = REDISKA.get('server_secret_key')
+                secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil' else secret_key
+                _, status = decode_token(token, secret_key)
+                print('middleware: ', status)
+                return RJR(status) if status != 22 else None
+            else:
+
         elif header_type == 'user':
             secret_key = 'secret_key'
 

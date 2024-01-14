@@ -1,4 +1,5 @@
 import os, requests, json, jwt, secrets, datetime, redis
+from django.views.decorators.csrf import csrf_exempt
 from MainApp.models import server_data
 from datetime import datetime, timedelta
 from django.core.cache import cache
@@ -126,21 +127,26 @@ def node_connection():
     SaveTokens(main_access_token, main_refresh_token, secret_key, status)
 
 
+@csrf_exempt
 def UpdateNodeTokens(request):
+    print('\n', request.body, '\n')
     data = json.loads(request.body)
+    print('\n', data, '\n')
     main_server_access_token = data["access_token"]
     main_server_refresh_token = data["refresh_token"]
+    print(main_server_access_token)
 
     if (
         main_server_access_token is None
-        or  main_server_refresh_token is None
+        or main_server_refresh_token is None
     ):
-        RJR(13)
+        return RJR(13)
     
     local_access_token, local_refresh_token, secret_key, _ = get_data()
+    print('hui')
     resp_data ={
         'access_token':  local_access_token,
-        'refresh_token':  local_refresh_token
+        'refresh_token':  local_refresh_token,
     }
     print('updating')
     SaveTokens(local_access_token, local_refresh_token, secret_key, 23)
@@ -168,7 +174,7 @@ def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-node_connection()
+#node_connection()
 
 
 status_list = {
