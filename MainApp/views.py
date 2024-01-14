@@ -38,6 +38,7 @@ def AddUser(request):
         FolderName="None",
         FolderParent="None",
     )
+    print('add user')
 
     return RJR(21)
 

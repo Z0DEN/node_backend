@@ -118,12 +118,12 @@ def node_connection():
     main_refresh_token = response_data["refresh_token"]
     
     if status >= 20 and status < 30:
-        print(f"Success: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
+        print(f"Success: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}\n")
     elif status < 20:
-        print(f"Failed to make connection: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}")
+        print(f"Failed to make connection: {status} \nmsg: {msg} \nmain_access_token: {main_access_token} \nmain_refresh_token: {main_refresh_token}\n")
         return
 
-    UpdateLocalTokens(main_access_token, main_refresh_token, secret_key, status)
+    SaveTokens(main_access_token, main_refresh_token, secret_key, status)
 
 
 def UpdateNodeTokens(request):
@@ -143,11 +143,11 @@ def UpdateNodeTokens(request):
         'refresh_token':  local_refresh_token
     }
     print('updating')
-    UpdateLocalTokens(local_access_token, local_refresh_token, secret_key, 23)
+    SaveTokens(local_access_token, local_refresh_token, secret_key, 23)
     RJR(response_data=resp_data,status=23)
 
      
-def UpdateLocalTokens(main_access_token, main_refresh_token, secret_key, status):
+def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
     if status == 21:
         new_data = server_data(
             main_server_access_token = main_access_token,
