@@ -174,7 +174,7 @@ def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-#node_connection()
+node_connection()
 
 
 status_list = {

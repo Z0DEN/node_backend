@@ -16,11 +16,11 @@ class user_data_model(models.Model):
     FolderName = models.CharField(max_length=256)
     FolderParent = models.CharField(max_length=256)
     date_added = models.DateTimeField(auto_now_add=True)
-    personal_key = models.CharField(max_length=64, default="personal_key")
 
 
 class server_data(models.Model):
     secret_key = models.CharField(unique=True, max_length=1024)
+    personal_key = models.CharField(max_length=64, default="personal_key")
     main_server_access_token = models.CharField(unique=True, max_length=1024)
     main_server_refresh_token = models.CharField(unique=True, max_length=1024)
 #    local_server_access_token = models.CharField(unique=True, max_length=1024)
