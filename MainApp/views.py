@@ -20,7 +20,7 @@ def RJR(status=False, msg=False):
 
 @csrf_exempt
 def AddUser(request):
-    username = request.POST['username']
+    username = request.POST.get('username')
 
     if not username:
         return RJR(13)

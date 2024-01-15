@@ -1,8 +1,9 @@
 import os, requests, json, jwt, secrets, datetime, redis
 from django.views.decorators.csrf import csrf_exempt
-from MainApp.models import server_data
+from django.http import JsonResponse
 from datetime import datetime, timedelta
 from django.core.cache import cache
+from MainApp.models import server_data
 from .tokens import *
 
 RPASSWORD = os.environ.get('RPASSWORD')
@@ -13,10 +14,8 @@ personal_key = "personal_key"
 global status_list
 
 def RJR(response_data={}, status=False, msg=False):
-    response_data = {
-        "status": status if status else "Success, or not success, that is the question",
-        "msg": status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???",
-    }
+    response_data['status'] = status if status else "Success, or not success, that is the question"
+    response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
     return JsonResponse(response_data)
 
 
@@ -129,12 +128,9 @@ def node_connection():
 
 @csrf_exempt
 def UpdateNodeTokens(request):
-    print('\n', request.body, '\n')
     data = json.loads(request.body)
-    print('\n', data, '\n')
     main_server_access_token = data["access_token"]
     main_server_refresh_token = data["refresh_token"]
-    print(main_server_access_token)
 
     if (
         main_server_access_token is None
@@ -143,14 +139,12 @@ def UpdateNodeTokens(request):
         return RJR(13)
     
     local_access_token, local_refresh_token, secret_key, _ = get_data()
-    print('hui')
-    resp_data ={
+    response_data ={
         'access_token':  local_access_token,
         'refresh_token':  local_refresh_token,
     }
-    print('updating')
-    SaveTokens(local_access_token, local_refresh_token, secret_key, 23)
-    RJR(response_data=resp_data,status=23)
+    SaveTokens(main_server_access_token, main_server_refresh_token, secret_key, 23)
+    return RJR(response_data=response_data,status=23)
 
      
 def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
@@ -174,7 +168,7 @@ def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
 
-node_connection()
+#node_connection()
 
 
 status_list = {

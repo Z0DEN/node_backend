@@ -53,7 +53,8 @@ class TokenAuthMiddleware(MiddlewareMixin):
 
         if from_header == 'server':
             if header_type == 'personal':
-                local_personal_key = server_data.objects.get('personal_key')
+                local_personal_key = server_data.objects.get(personal_key='personal_key').personal_key
+                print('local_personal_key: ', local_personal_key, '\n','token: ',  token)
                 return RJR(15) if local_personal_key != token else None
             else:
                 secret_key = REDISKA.get('server_secret_key')
