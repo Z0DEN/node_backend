@@ -1,4 +1,5 @@
 import datetime, secrets
+import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -20,13 +21,12 @@ def RJR(status=False, msg=False):
 
 @csrf_exempt
 def AddUser(request):
-    username = request.POST.get('username')
+    username = json.loads(request.body)['username']
 
     if not username:
         return RJR(13)
     if main_user_model.objects.filter(username=username).exists():
         return RJR(17)
-
 
     new_user = main_user_model(
             username = username,
@@ -38,7 +38,6 @@ def AddUser(request):
         FolderName="None",
         FolderParent="None",
     )
-    print('add user')
 
     return RJR(21)
 
