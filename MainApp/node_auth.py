@@ -74,8 +74,11 @@ def get_data():
     return local_access_token, local_refresh_token, secret_key, data
 
 
-def send_data(data_to_send, token_type='main_server_access_token'):
+def send_data(data_to_send, func, token_type='main_server_access_token'):
     obj = server_data.objects.first()
+    request_url1 = f'http://192.168.0.98:8005/{func}/'
+    request_url2 = f'http://176.197.34.213:8005/{func}/'
+    headers = {'Content-Type': 'application/json'}
 
     if obj is not None and token_type != 'None': 
         token = getattr(obj, token_type)
@@ -84,10 +87,10 @@ def send_data(data_to_send, token_type='main_server_access_token'):
         headers['Authorization'] = 'personal ' + personal_key
 
     try:
-        response = requests.post(url1, data=json.dumps(data_to_send), headers=headers)
+        response = requests.post(request_url1, data=json.dumps(data_to_send), headers=headers)
     except requests.exceptions.RequestException:
          data_to_send["local_connection"] = False
-         response = requests.post(url2, data=json.dumps(data_to_send), headers=headers)
+         response = requests.post(request_url2, data=json.dumps(data_to_send), headers=headers)
 
     data = response.json()
     status = data["status"]
@@ -95,24 +98,15 @@ def send_data(data_to_send, token_type='main_server_access_token'):
     if status == 22 or status == 23 or status == 21:
         return data
     elif status == 14 and token_type != 'main_server_refresh_token': 
-        return send_data(data_to_send, 'main_server_refresh_token')
+        return send_data(data_to_send, func, 'main_server_refresh_token')
     else:
-        return send_data(data_to_send, 'None')
-
-
-url1 = 'http://192.168.0.98:8002/NodeConnection/'
-url2 = 'http://176.197.34.213:8002/NodeConnection/'
-#url1 = 'http://192.168.0.98:8005/NodeConnection/'
-#url2 = 'http://176.197.34.213:8005/NodeConnection/'
-headers = {'Content-Type': 'application/json'}
+        return send_data(data_to_send, func, 'None')
 
 
 def node_connection():
     local_access_token, local_refresh_token, secret_key, data_to_send = get_data()
     
-    response = None
-    
-    response_data = send_data(data_to_send) 
+    response_data = send_data(data_to_send, 'NodeConnection') 
     
     msg = response_data["msg"]
     status = response_data["status"]

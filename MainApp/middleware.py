@@ -6,6 +6,7 @@ from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.views import test
 from MainApp.models import server_data, main_user_model, user_data_model
+from MainApp.node_auth import send_data, node_connection
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
@@ -60,13 +61,31 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 _, status = decode_token(token, secret_key)
                 return RJR(status) if status != 22 else None
 
-        elif header_type == 'user':
-            secret_key = 'secret_key'
+        elif from_header == 'user':
+            data = json.loads(request.body)
+            call_func = data.get('func', 'get_user_data')
+            node_UUID= os.environ.get('UUID')
+            data_to_send = {
+                'username': request.user,
+                'Bearer': token,
+                'node_UUID': node_UUID,
+            }
+            response_data = send_data(data_to_send, 'TokenVerify')
+            node_validate_status = response_data.get('node_validate_status', None)
+            user_validate_status = response_data.get('user_validate_status', None)
+            if node_validate_status != 22 or node_validate_status is None:
+                node_connection()
+                return RJR(31)
+            if user_validate_status != 22 or user_validate_status is None:
+                return RJR(user_validate_status)
+            if status != 22:
+                return RJR(status)
 
 
 
 
 
+# ------------------------------------------------------------- #
 #                            STATUSES                           #
 # ------------------------------------------------------------- #
 #   1<..>  -> Error
@@ -89,6 +108,7 @@ STATUS_LIST = {
     23: "Data successfully changed. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
+    31: "Something goes wrong, try again. ", 
     # ------------------------------------------------------------- #
     40: "Undefined info. ",
 }
