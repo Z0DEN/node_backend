@@ -39,6 +39,7 @@ def decode_token(token, secret_key):
 
 class TokenAuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
+        print('start porn')
         if request.method != "POST":
             return RJR(12)
 
@@ -63,7 +64,7 @@ class TokenAuthMiddleware(MiddlewareMixin):
 
         elif from_header == 'user':
             data = json.loads(request.body)
-            call_func = data.get('func', 'get_user_data')
+            print('data: ', data)
             node_UUID= os.environ.get('UUID')
             data_to_send = {
                 'username': request.user,
@@ -71,6 +72,7 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 'node_UUID': node_UUID,
             }
             response_data = send_data(data_to_send, 'TokenVerify')
+            print('response data: ', response_data)
             node_validate_status = response_data.get('node_validate_status', None)
             user_validate_status = response_data.get('user_validate_status', None)
             if node_validate_status != 22 or node_validate_status is None:

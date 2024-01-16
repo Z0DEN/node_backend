@@ -1,0 +1,28 @@
+2024-01-16 14:40:00,106 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2024-01-16 14:40:00,116 INFO supervisord started with pid 466
+2024-01-16 14:40:01,121 INFO spawned: 'django' with pid 468
+2024-01-16 14:40:02,265 INFO success: django entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-01-16 14:43:57,712 WARN received SIGINT indicating exit request
+2024-01-16 14:43:57,714 INFO waiting for django to die
+2024-01-16 14:43:58,716 INFO stopped: django (terminated by SIGTERM)
+2024-01-16 14:44:01,884 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2024-01-16 14:44:01,893 INFO supervisord started with pid 493
+2024-01-16 14:44:02,898 INFO spawned: 'django' with pid 495
+2024-01-16 14:44:03,927 INFO success: django entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-01-16 15:19:11,686 WARN received SIGINT indicating exit request
+2024-01-16 15:19:11,687 INFO waiting for django to die
+2024-01-16 15:19:12,690 INFO stopped: django (terminated by SIGTERM)
+2024-01-16 15:19:17,093 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2024-01-16 15:19:17,101 INFO supervisord started with pid 529
+2024-01-16 15:19:18,106 INFO spawned: 'django' with pid 531
+2024-01-16 15:19:19,134 INFO success: django entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-01-16 15:19:21,006 WARN received SIGINT indicating exit request
+2024-01-16 15:19:21,008 INFO waiting for django to die
+2024-01-16 15:19:21,011 INFO stopped: django (terminated by SIGTERM)
+2024-01-16 15:19:52,333 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2024-01-16 15:19:52,341 INFO supervisord started with pid 547
+2024-01-16 15:19:53,346 INFO spawned: 'django' with pid 549
+2024-01-16 15:19:54,373 INFO success: django entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-01-16 15:22:02,811 WARN received SIGINT indicating exit request
+2024-01-16 15:22:02,812 INFO waiting for django to die
+2024-01-16 15:22:03,814 INFO stopped: django (terminated by SIGTERM)

@@ -42,10 +42,10 @@ def get_data():
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    #access_expiration = issued_at + timedelta(minutes=30)
-    #refresh_expiration = issued_at + timedelta(days=5)
-    access_expiration = issued_at + timedelta(minutes=1)
-    refresh_expiration = issued_at + timedelta(minutes=3)
+    access_expiration = issued_at + timedelta(minutes=30)
+    refresh_expiration = issued_at + timedelta(days=5)
+#    access_expiration = issued_at + timedelta(minutes=1)
+#    refresh_expiration = issued_at + timedelta(minutes=3)
     
     refresh_payload = {
         "sub": node_domain,
