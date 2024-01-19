@@ -67,12 +67,14 @@ class TokenAuthMiddleware(MiddlewareMixin):
             print('start verify user token')
             data = json.loads(request.body)
             node_UUID= os.environ.get('UUID')
+            username = data.get('username', None)
+            if node_UUID is None or username is None:
+                return RJR(status=13)
             data_to_send = {
-                'username': data['username'],
+                'username': username,
                 'Bearer': token,
                 'node_UUID': node_UUID,
             }
-            print(data_to_send)
             response_data = send_data(data_to_send, 'TokenVerify')
             print('response data: ', response_data)
             node_validate_status = response_data.get('node_validate_status', None)

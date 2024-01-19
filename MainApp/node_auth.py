@@ -42,10 +42,10 @@ def get_data():
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=30)
-    refresh_expiration = issued_at + timedelta(days=5)
-#    access_expiration = issued_at + timedelta(minutes=1)
-#    refresh_expiration = issued_at + timedelta(minutes=3)
+#    access_expiration = issued_at + timedelta(minutes=30)
+#    refresh_expiration = issued_at + timedelta(days=5)
+    access_expiration = issued_at + timedelta(minutes=1)
+    refresh_expiration = issued_at + timedelta(minutes=3)
     
     refresh_payload = {
         "sub": node_domain,
@@ -91,7 +91,7 @@ def send_data(data_to_send, func, token_type='main_server_access_token'):
     except requests.exceptions.RequestException:
          data_to_send["local_connection"] = False
          response = requests.post(request_url2, data=json.dumps(data_to_send), headers=headers)
-    print('responst: ', response, '\n')
+
     data = response.json()
     status = data["status"]
 
