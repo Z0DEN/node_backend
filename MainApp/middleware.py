@@ -1,6 +1,7 @@
 import jwt
 import os
 import redis
+import json
 from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
@@ -48,9 +49,9 @@ class TokenAuthMiddleware(MiddlewareMixin):
         if not bearer_header:
             return RJR(16)
 
-        token = bearer_header.split(' ')[2]
-        header_type = bearer_header.split(' ')[1]
         from_header = bearer_header.split(' ')[0]
+        header_type = bearer_header.split(' ')[1]
+        token = bearer_header.split(' ')[2]
 
         if from_header == 'server':
             if header_type == 'personal':
@@ -63,14 +64,15 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 return RJR(status) if status != 22 else None
 
         elif from_header == 'user':
+            print('start verify user token')
             data = json.loads(request.body)
-            print('data: ', data)
             node_UUID= os.environ.get('UUID')
             data_to_send = {
-                'username': request.user,
+                'username': data['username'],
                 'Bearer': token,
                 'node_UUID': node_UUID,
             }
+            print(data_to_send)
             response_data = send_data(data_to_send, 'TokenVerify')
             print('response data: ', response_data)
             node_validate_status = response_data.get('node_validate_status', None)
@@ -80,8 +82,6 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 return RJR(31)
             if user_validate_status != 22 or user_validate_status is None:
                 return RJR(user_validate_status)
-            if status != 22:
-                return RJR(status)
 
 
 

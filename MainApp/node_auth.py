@@ -91,7 +91,7 @@ def send_data(data_to_send, func, token_type='main_server_access_token'):
     except requests.exceptions.RequestException:
          data_to_send["local_connection"] = False
          response = requests.post(request_url2, data=json.dumps(data_to_send), headers=headers)
-
+    print('responst: ', response, '\n')
     data = response.json()
     status = data["status"]
 
