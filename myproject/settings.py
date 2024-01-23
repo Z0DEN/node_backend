@@ -77,9 +77,16 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "https://192.168.0.98",
     "http://192.168.0.98",
+    
     "https://192.168.0.81",
     "http://192.168.0.81",
+
     "http://127.0.0.1",
+    "https://127.0.0.1",
+
+    "https://176.197.34.213",
+    "http://176.197.34.213",
+
     "https://whoole.space",
     "http://whoole.space",
 ]
