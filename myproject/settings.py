@@ -15,17 +15,18 @@ import os
 EX_IP = os.environ.get('EX_IP')
 IN_IP = os.environ.get('IN_IP')
 
-ALLOWED_HOSTS = [IN_IP,'localhost','127.0.0.1',EX_IP]
+ALLOWED_HOSTS = [IN_IP, EX_IP, 'localhost', '127.0.0.1', "whoole.space", "176.197.34.213"]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "http://127.0.0.1",
+
 ]
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SERVER_CERTIFICATE = '/certificate.crt'
-SERVER_KEY = '/django.key'
+SERVER_CERTIFICATE = '/server.pem'
+SERVER_KEY = '/serverkey.pem'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,17 +70,19 @@ MIDDLEWARE = [
     'MainApp.middleware.TokenAuthMiddleware',
 ]
 
-#SECURE_REFERRER_POLICY = 'no-referrer'
+SECURE_REFERRER_POLICY = 'no-referrer'
 
-#CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
-#CORS_ALLOWED_ORIGINS = [
-#    "https://192.168.0.98",
-#    "http://192.168.0.98",
-#    "https://192.168.0.81",
-#    "http://192.168.0.81",
-#    "http://127.0.0.1",
-#]
+CORS_ALLOWED_ORIGINS = [
+    "https://192.168.0.98",
+    "http://192.168.0.98",
+    "https://192.168.0.81",
+    "http://192.168.0.81",
+    "http://127.0.0.1",
+    "https://whoole.space",
+    "http://whoole.space",
+]
 
 ROOT_URLCONF = 'myproject.urls'
 

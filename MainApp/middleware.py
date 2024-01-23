@@ -40,7 +40,6 @@ def decode_token(token, secret_key):
 
 class TokenAuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        print('start porn')
         if request.method != "POST":
             return RJR(12)
 
@@ -64,7 +63,6 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 return RJR(status) if status != 22 else None
 
         elif from_header == 'user':
-            print('start verify user token')
             data = json.loads(request.body)
             node_UUID= os.environ.get('UUID')
             username = data.get('username', None)
@@ -76,7 +74,6 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 'node_UUID': node_UUID,
             }
             response_data = send_data(data_to_send, 'TokenVerify')
-            print('response data: ', response_data)
             node_validate_status = response_data.get('node_validate_status', None)
             user_validate_status = response_data.get('user_validate_status', None)
             if node_validate_status != 22 or node_validate_status is None:
@@ -84,7 +81,10 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 return RJR(31)
             if user_validate_status != 22 or user_validate_status is None:
                 return RJR(user_validate_status)
-
+# make adding user token to redis?????
+# make adding user token to redis?????
+# make adding user token to redis?????
+# make adding user token to redis?????
 
 
 
