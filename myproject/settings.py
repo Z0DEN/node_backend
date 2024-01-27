@@ -14,13 +14,42 @@ import os
 
 EX_IP = os.environ.get('EX_IP')
 IN_IP = os.environ.get('IN_IP')
+HOSTNAME = os.environ.get('HOSTNAME')
 
-ALLOWED_HOSTS = [IN_IP, EX_IP, 'localhost', '127.0.0.1', "whoole.space", "176.197.34.213"]
+ALLOWED_HOSTS = [
+    IN_IP, 
+    EX_IP, 
+    'localhost', 
+    '127.0.0.1', 
+    "whoole.space", 
+    HOSTNAME + ".whoole.space", 
+    "home.whoole.space", 
+    "176.197.34.213"
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "http://127.0.0.1",
 
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "https://192.168.0.98",
+    "http://192.168.0.98",
+    
+    "https://192.168.0.81",
+    "http://192.168.0.81",
+
+    "http://127.0.0.1",
+    "https://127.0.0.1",
+
+    "https://176.197.34.213",
+    "http://176.197.34.213",
+
+    "https://whoole.space",
+    "http://whoole.space",
 ]
 
 SESSION_COOKIE_SECURE = True
@@ -71,25 +100,6 @@ MIDDLEWARE = [
 ]
 
 SECURE_REFERRER_POLICY = 'no-referrer'
-
-CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "https://192.168.0.98",
-    "http://192.168.0.98",
-    
-    "https://192.168.0.81",
-    "http://192.168.0.81",
-
-    "http://127.0.0.1",
-    "https://127.0.0.1",
-
-    "https://176.197.34.213",
-    "http://176.197.34.213",
-
-    "https://whoole.space",
-    "http://whoole.space",
-]
 
 ROOT_URLCONF = 'myproject.urls'
 
