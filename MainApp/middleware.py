@@ -80,7 +80,7 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 node_connection()
                 return RJR(31)
             if user_validate_status != 22 or user_validate_status is None:
-                return RJR(15)
+                return RJR(user_validate_status)
 
 # make adding user token to redis?????
 # make adding user token to redis?????
