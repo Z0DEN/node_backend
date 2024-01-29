@@ -54,8 +54,9 @@ CORS_ALLOWED_ORIGINS = [
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SERVER_CERTIFICATE = '/server.pem'
-SERVER_KEY = '/serverkey.pem'
+SERVER_CERTIFICATE = f'/etc/letsencrypt/live/{HOSTNAME}.whoole.space/fullchain.pem'
+SERVER_KEY = f'/etc/letsencrypt/live/{HOSTNAME}.whoole.space/privkey.pem'
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
