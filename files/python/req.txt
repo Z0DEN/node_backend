@@ -1,4 +1,5 @@
 asgiref
+redis
 Brotli
 browser-cookie3
 jwt
