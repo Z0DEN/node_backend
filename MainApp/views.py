@@ -11,11 +11,9 @@ from .tokens import *
 global status_list
 
 
-def RJR(status=False, msg=False):
-    response_data = {
-        "status": status if status else "Success, or not success, that is the question",
-        "msg": status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???",
-    }
+def RJR(status=False, response_data={}, msg=False):
+    response_data['status'] = status if status else "Success, or not success, that is the question"
+    response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
     return JsonResponse(response_data)
 
 
@@ -33,13 +31,17 @@ def AddUser(request):
     )
     new_user.save()
     
-    user_data_model.objects.create(
-        username=new_user,
-        FolderName="None",
-        FolderParent="None",
-    )
-
     return RJR(21)
+
+
+@csrf_exempt
+def GetUserData(request):
+    data = json.loads(request.body)
+    username = data.get('username', None)
+    obj = main_user_model.objects.get(username=username)
+    print('obj: ', obj)
+    for row in obj:
+        print(row)
 
 
 @csrf_exempt
@@ -47,7 +49,15 @@ def test(request):
     print('start test')
     return RJR(22)
 
+
+
+
     
+#    user_data_model.objects.create(
+#        username=new_user,
+#        FolderName="None",
+#        FolderParent="None",
+#    )
 
 
 # ------------------------------------------------------------- #
