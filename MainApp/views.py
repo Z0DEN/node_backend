@@ -1,9 +1,9 @@
 import datetime, secrets
-import json
+import json, os
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from MainApp.models import main_user_model, user_data_model, server_data 
+from MainApp.models import User, Folder, File, server_data 
 from .node_auth import node_connection
 from .tokens import *
 
@@ -19,29 +19,38 @@ def RJR(status=False, response_data={}, msg=False):
 
 @csrf_exempt
 def AddUser(request):
+    print('start adding user')
     username = json.loads(request.body)['username']
 
     if not username:
         return RJR(13)
-    if main_user_model.objects.filter(username=username).exists():
+    if User.objects.filter(username=username).exists():
         return RJR(17)
 
-    new_user = main_user_model(
+    new_user = User(
             username = username,
     )
     new_user.save()
+    print(new_user)
+    user_dir = os.path.join("/storage", username)
+    print(user_dir)
+    os.makedirs(user_dir)
     
     return RJR(21)
-
 
 @csrf_exempt
 def GetUserData(request):
     data = json.loads(request.body)
     username = data.get('username', None)
-    obj = main_user_model.objects.get(username=username)
-    print('obj: ', obj)
-    for row in obj:
-        print(row)
+    user = User.objects.get(username=username)
+    for folder in user.folders:
+        print(folder)
+
+def CreateFolder(request):
+    data = json.loads(request.body)
+    folder_name = data.get('folder_name', None)
+    
+
 
 
 @csrf_exempt
@@ -53,7 +62,7 @@ def test(request):
 
 
     
-#    user_data_model.objects.create(
+#    Folder.objects.create(
 #        username=new_user,
 #        FolderName="None",
 #        FolderParent="None",
