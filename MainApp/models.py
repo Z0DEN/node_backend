@@ -2,33 +2,30 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
 
+def user_directory_path(instance, filename):
+    return f'{instance.folder.user.username}/{filename}'
+
+
 class FileManager(models.Manager):
-  def create_file(self, name, folder, upload_to,):
-    file = self.create(upload_to=upload_to, name=name, folder=folder, user=user)
-    return file
+    def create_file(self, name, folder, file):
+        file = self.create(file=file, name=name, folder=folder)
+        return file
 
-  def create_folder(self, name, parent, user):
-    folder = self.create(name=name, folder=folder, user=user)
-    return folder
 
-  def get_files_by_user(self, user):
-    files = self.filter(user=user)
-    return files
+    def create_folder(self, name, parent, user):
+        folder = self.create(name=name, parent=parent, user=user)
+        return folder
 
-  def delete_files_by_user(self, user):
-    self.filter(user=user).delete()
-    return "Files deleted successfully"
 
-# ---------------------------------------------------------------------------------------------------- #
 
 class UserManager(models.Manager):
-  def create_user(self, username):
-    user = self.create(username=username)
-    return user
+    def create_user(self, username):
+        user = self.create(username=username)
+        return user
 
-  def get_all_users(self):
-    users = self.all()
-    return users
+    def get_all_users(self):
+        users = self.all()
+        return users
 
 # ---------------------------------------------------------------------------------------------------- #
 
@@ -55,7 +52,7 @@ class Folder(models.Model):
 
 
 class File(models.Model):
-    file = models.FileField(upload_to="lost+found")
+    file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="files")
     date_added = models.DateTimeField(auto_now_add=True)
