@@ -31,10 +31,10 @@ def AddUser(request):
             username = username,
     )
     new_user.save()
-    print(new_user)
-    user_dir = os.path.join("/storage", username)
-    print(user_dir)
-    os.makedirs(user_dir)
+#    print(new_user)
+#    user_dir = os.path.join("/storage", username)
+#    print(user_dir)
+#    os.makedirs(user_dir)
     
     return RJR(21)
 
@@ -46,17 +46,31 @@ def GetUserData(request):
     for folder in user.folders:
         print(folder)
 
+
+@csrf_exempt
 def CreateFolder(request):
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
+    folder_parent = data.get('folder_parent', None)
+    username = data.get('username')
     
+    user = User.objects.get(username=username)
+
+    folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user)
+    if not created:
+        return RJR(status=10, msg='Folder already exist')
+    else:
+        return RJR(status=20, msg='Folder was successfully created')
+
 
 
 
 @csrf_exempt
 def test(request):
-    print('start test')
-    return RJR(22)
+    file = request.FILES['file']
+    file = File.objects.create_file(name=file.name, folder=folder, file=file)
+
+    return HttpResponse('File uploaded successfully')
 
 
 

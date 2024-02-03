@@ -8,14 +8,13 @@ def user_directory_path(instance, filename):
 
 class FileManager(models.Manager):
     def create_file(self, name, folder, file):
-        file = self.create(file=file, name=name, folder=folder)
-        return file
+        file, created = self.get_or_create(file=file, name=name, folder=folder)
+        return file, created
 
 
     def create_folder(self, name, parent, user):
-        folder = self.create(name=name, parent=parent, user=user)
-        return folder
-
+        folder, created = self.get_or_create(name=name, parent=parent, user=user)
+        return folder, created
 
 
 class UserManager(models.Manager):
@@ -40,8 +39,9 @@ class User(models.Model):
 
 
 class Folder(models.Model):
-    name = models.CharField(max_length=256)
-    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="children")
+    name = models.CharField(max_length=256, default='Folder')
+    parent = models.CharField(max_length=256, default='Root')
+#    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="children")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders")
     date_added = models.DateTimeField(auto_now_add=True)
 
