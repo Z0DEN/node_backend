@@ -43,13 +43,28 @@ def GetUserData(request):
     data = json.loads(request.body)
     username = data.get('username', None)
     user = User.objects.get(username=username)
-    for folder in user.folders:
-        print(folder)
+    user_files = []
+    for folder in user.folders.all():
+        folder_data = {
+            'type': 'folder',
+            'name': folder.name,
+            'parent': folder.parent,
+            'date_added': folder.date_added,
+        }
+        user_files.append(folder_data)
+        for file in folder.files.all():
+            file_data = {
+                'type': 'file',
+                'name': file.name,
+                'parent': file.parent,
+                'date_added': file.date_added,
+            }
+            user_files.append(file_data) 
+    print(user_files)
 
 
 @csrf_exempt
 def CreateFolder(request):
-    print('start create folder')
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
     folder_parent = data.get('folder_parent', None)
@@ -58,11 +73,10 @@ def CreateFolder(request):
     user = User.objects.get(username=username)
 
     folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user)
-    print(folder)
     if not created:
-        return RJR(status=10, msg='Folder already exist')
+        return RJR(status=18)
     else:
-        return RJR(status=20, msg='Folder was successfully created')
+        return RJR(status=24)
 
 
 
@@ -102,12 +116,13 @@ status_list = {
     15: "Invalid Token. ",
     16: "Request have no auth token (Bearer). ",
     17: "User already exist. ", 
+    18: 'Folder or file already exist. ',
     # ------------------------------------------------------------- #
     20: "Undefined success. ",
     21: "Node or user was successfully created. ",
     22: "Token is Valid. ",
     23: "Data successfully changed. ",
-    24: "Folder was successfully created. ",
+    24: "Folder or file was successfully created. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
     # ------------------------------------------------------------- #

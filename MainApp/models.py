@@ -40,8 +40,8 @@ class User(models.Model):
 
 class Folder(models.Model):
     name = models.CharField(max_length=256, default='Folder')
-    parent = models.CharField(max_length=256, default='Root')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders")
+    parent = models.CharField(max_length=256, default='root')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders", default=1)
     date_added = models.DateTimeField(auto_now_add=True)
 
     objects = FileManager()
@@ -52,10 +52,10 @@ class Folder(models.Model):
 
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
-    name = models.CharField(max_length=256)
-    parent = models.CharField(max_length=256, default='Root')
+    name = models.CharField(max_length=256, default="file")
+    parent = models.CharField(max_length=256, default='root')
     date_added = models.DateTimeField(auto_now_add=True)
-#   folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="files")
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="files", default=1)
 
     objects = FileManager()
 

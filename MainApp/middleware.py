@@ -20,8 +20,8 @@ REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
 def RJR(status=False, msg=False):
     response_data = {
-        "status": status if status else "Success, or not success, that is the question",
-        "msg": STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "???UNDEFINED ERROR???",
+        "status": status if status else None,
+        "msg": STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "Success, or not success, that is the question",
     }
     return JsonResponse(response_data)
 
@@ -76,6 +76,7 @@ class TokenAuthMiddleware(MiddlewareMixin):
             response_data = send_data(data_to_send, 'TokenVerify')
             node_validate_status = response_data.get('node_validate_status', None)
             user_validate_status = response_data.get('user_validate_status', None)
+            print(response_data)
             if node_validate_status != 22 or node_validate_status is None:
                 node_connection()
                 return RJR(31)
