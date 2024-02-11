@@ -49,6 +49,7 @@ def GetUserData(request):
 
 @csrf_exempt
 def CreateFolder(request):
+    print('start create folder')
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
     folder_parent = data.get('folder_parent', None)
@@ -57,6 +58,7 @@ def CreateFolder(request):
     user = User.objects.get(username=username)
 
     folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user)
+    print(folder)
     if not created:
         return RJR(status=10, msg='Folder already exist')
     else:
@@ -105,6 +107,7 @@ status_list = {
     21: "Node or user was successfully created. ",
     22: "Token is Valid. ",
     23: "Data successfully changed. ",
+    24: "Folder was successfully created. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
     # ------------------------------------------------------------- #
