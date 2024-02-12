@@ -6,7 +6,7 @@ from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.views import test
-from MainApp.models import server_data
+from MainApp.models import server_data, User
 from MainApp.node_auth import send_data, node_connection
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -76,12 +76,14 @@ class TokenAuthMiddleware(MiddlewareMixin):
             response_data = send_data(data_to_send, 'TokenVerify')
             node_validate_status = response_data.get('node_validate_status', None)
             user_validate_status = response_data.get('user_validate_status', None)
-            print(response_data)
             if node_validate_status != 22 or node_validate_status is None:
                 node_connection()
                 return RJR(31)
             if user_validate_status != 22 or user_validate_status is None:
                 return RJR(user_validate_status)
+
+            if User.objects.filter(username=username).exists() == False:
+                User.objects.create_user(username)
 
 # make adding user token to redis?????
 # make adding user token to redis?????

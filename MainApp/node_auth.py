@@ -154,7 +154,7 @@ def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
     if status == 23:
-        obj = server_data.objects.first()
+        obj, created = server_data.objects.get_or_create(id=1)
         data_to_update = {
             'main_server_access_token': main_access_token,
             'main_server_refresh_token': main_refresh_token,
