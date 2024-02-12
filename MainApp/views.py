@@ -61,6 +61,7 @@ def GetUserData(request):
             }
             user_files.append(file_data) 
     print(user_files)
+    return RJR(status=20, msg=f"{user_files}")
 
 
 @csrf_exempt
