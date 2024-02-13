@@ -11,9 +11,10 @@ from .tokens import *
 global status_list
 
 
-def RJR(status=False, response_data={}, msg=False):
+def RJR(status=False, response_data={}, msg=False, data=[]):
     response_data['status'] = status if status else "Success, or not success, that is the question"
     response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
+    response_data['data'] = data
     return JsonResponse(response_data)
 
 
@@ -61,7 +62,7 @@ def GetUserData(request):
             }
             user_files.append(file_data) 
     print(user_files)
-    return RJR(status=20, msg=f"{user_files}")
+    return RJR(status=20, data=user_files)
 
 
 @csrf_exempt
