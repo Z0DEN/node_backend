@@ -63,9 +63,8 @@ class TokenAuthMiddleware(MiddlewareMixin):
                 return RJR(status) if status != 22 else None
 
         elif from_header == 'user':
-            data = json.loads(request.body)
-            node_UUID= os.environ.get('UUID')
-            username = data.get('username', None)
+            node_UUID = os.environ.get('UUID')
+            username = request.headers.get('username')
             if node_UUID is None or username is None:
                 return RJR(status=13)
             data_to_send = {

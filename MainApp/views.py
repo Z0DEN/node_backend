@@ -61,7 +61,6 @@ def GetUserData(request):
                 'date_added': file.date_added,
             }
             user_files.append(file_data) 
-    print(user_files)
     return RJR(status=20, data=user_files)
 
 
@@ -81,6 +80,14 @@ def CreateFolder(request):
         return RJR(status=24)
 
 
+@csrf_exempt
+def SaveFiles(request):
+    files = []
+    for key, file in request.FILES.items():
+        files.appendI(file)
+    with open('output.txt', 'w') as file:
+        print(files, file=file)
+    return RJR(status=25)
 
 
 @csrf_exempt
@@ -89,8 +96,6 @@ def test(request):
     file = File.objects.create_file(name=file.name, folder=folder, file=file)
 
     return HttpResponse('File uploaded successfully')
-
-
 
 
     
@@ -125,6 +130,7 @@ status_list = {
     22: "Token is Valid. ",
     23: "Data successfully changed. ",
     24: "Folder or file was successfully created. ",
+    25: "Files was successfully saved. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
     # ------------------------------------------------------------- #
