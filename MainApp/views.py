@@ -87,17 +87,13 @@ def SaveFiles(request):
     files = request.FILES.getlist('user_files')
     user = User.objects.get(username=username)
     folder = user.folders.get(name=parent)
+    if folder is None:
+        return RJR(status=13, msg="folder can not be none")
 
     for file in files:
         file_obj, created = File.objects.create_file(file=file, name=file.name, folder=folder)
 
     return RJR(status=25)
-
-
-@csrf_exempt
-def test(request):
-
-    return HttpResponse('File uploaded successfully')
 
 
     

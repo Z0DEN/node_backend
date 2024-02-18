@@ -5,7 +5,6 @@ import json
 from django.middleware.common import MiddlewareMixin
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
-from MainApp.views import test
 from MainApp.models import server_data, User
 from MainApp.node_auth import send_data, node_connection
 
