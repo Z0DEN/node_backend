@@ -82,18 +82,20 @@ def CreateFolder(request):
 
 @csrf_exempt
 def SaveFiles(request):
-    files = []
-    for key, file in request.FILES.items():
-        files.appendI(file)
-    with open('output.txt', 'w') as file:
-        print(files, file=file)
+    parent = request.POST.get('parent')
+    username = request.POST.get('username')
+    files = request.FILES.getlist('user_files')
+    user = User.objects.get(username=username)
+    folder = user.folders.get(name=parent)
+
+    for file in files:
+        file_obj, created = File.objects.create_file(file=file, name=file.name, folder=folder)
+
     return RJR(status=25)
 
 
 @csrf_exempt
 def test(request):
-    file = request.FILES['file']
-    file = File.objects.create_file(name=file.name, folder=folder, file=file)
 
     return HttpResponse('File uploaded successfully')
 

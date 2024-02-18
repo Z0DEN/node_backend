@@ -7,8 +7,8 @@ def user_directory_path(instance, filename):
 
 
 class FileManager(models.Manager):
-    def create_file(self, name, folder, file):
-        file, created = self.get_or_create(file=file, name=name, folder=folder)
+    def create_file(self, file, name, folder):
+        file, created = self.get_or_create(file=file, name=name, parent=folder.name, folder=folder)
         return file, created
 
 
