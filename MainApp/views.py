@@ -1,6 +1,6 @@
 import datetime, secrets
 import json, os
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from MainApp.models import User, Folder, File, server_data 
@@ -104,21 +104,25 @@ def UploadFiles(request):
 
 @csrf_exempt
 def DownloadFiles(request):
-    data = json.loads(request.body)
-    username = data.get('username')
-    file_names = data.get('file_names', False)
-    if not file_names:
-        return RJR(status=13, msg='file_names should be non-empty array')
-    user = User.objects.get(username=username)
-    paths = []
-    FileDoesNotExist = []
-    for name in file_names:
-        try:
-            paths.append(user.files.get(name=name).file.path)
-        except ObjectDoesNotExist:
-            FileDoesNotExist.append(name)
-
-    return RJR(status=20, msg=f"{paths}")
+#    path = json.loads(request.body).get('path')
+    with open('output.txt', 'w') as file:
+        print('/storage/', file=file)
+    return FileResponse(open('/storage/blesk42/24-241.txt', 'rb'))
+#    data = json.loads(request.body)
+#    username = data.get('username')
+#    file_names = data.get('file_names', False)
+#    if not file_names:
+#        return RJR(status=13, msg='file_names should be non-empty array')
+#    user = User.objects.get(username=username)
+#    paths = []
+#    FileDoesNotExist = []
+#    for name in file_names:
+#        try:
+#            paths.append(user.files.get(name=name).file.path)
+#        except ObjectDoesNotExist:
+#            FileDoesNotExist.append(name)
+#
+#    return RJR(status=20, msg=f"{paths}")
 
 
 
