@@ -113,17 +113,22 @@ def DownloadFiles(request):
         return RJR(status=13, msg='file_name should be non-empty string')
     user = User.objects.get(username=username)
     try:
-        path = user.files.get(name=file_name).file.path
+        file = user.files.get(name=file_name)
     except ObjectDoesNotExist:
         return RJR(status=10, msg="file does not exist")
 
-#    with open('output.txt', 'w') as file:
-#        print(path, file=file)
+    with open('output.txt', 'w') as print_file:
+        print(file.file, file=print_file)
 
-    with open(path, 'rb') as file:
-        response = FileResponse(file, content_type='application/octet-stream')
-        response['Content-Disposition'] = f'inline; filename={file_name}'
-        return response
+    return FileResponse(file.file, as_attachment=True, filename=file.name)
+
+
+
+
+#    with open(path, 'rb') as file:
+#        response = FileResponse(file, content_type='application/octet-stream')
+#        response['Content-Disposition'] = f'inline; filename={file_name}'
+#        return response
 
 
     
