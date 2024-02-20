@@ -104,26 +104,26 @@ def UploadFiles(request):
 
 @csrf_exempt
 def DownloadFiles(request):
-#    path = json.loads(request.body).get('path')
-    with open('output.txt', 'w') as file:
-        print('/storage/', file=file)
-    return FileResponse(open('/storage/blesk42/24-241.txt', 'rb'))
-#    data = json.loads(request.body)
-#    username = data.get('username')
-#    file_names = data.get('file_names', False)
-#    if not file_names:
-#        return RJR(status=13, msg='file_names should be non-empty array')
-#    user = User.objects.get(username=username)
-#    paths = []
-#    FileDoesNotExist = []
-#    for name in file_names:
-#        try:
-#            paths.append(user.files.get(name=name).file.path)
-#        except ObjectDoesNotExist:
-#            FileDoesNotExist.append(name)
-#
-#    return RJR(status=20, msg=f"{paths}")
+    #file_path = '/storage/blesk42/24-241.txt'
 
+    data = json.loads(request.body)
+    username = data.get('username')
+    file_name = data.get('file_name', False)
+    if not file_name:
+        return RJR(status=13, msg='file_name should be non-empty string')
+    user = User.objects.get(username=username)
+    try:
+        path = user.files.get(name=file_name).file.path
+    except ObjectDoesNotExist:
+        return RJR(status=10, msg="file does not exist")
+
+#    with open('output.txt', 'w') as file:
+#        print(path, file=file)
+
+    with open(path, 'rb') as file:
+        response = FileResponse(file, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'inline; filename={file_name}'
+        return response
 
 
     
