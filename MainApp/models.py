@@ -56,6 +56,7 @@ class File(models.Model):
     parent = models.CharField(max_length=256, default='root')
     date_added = models.DateTimeField(auto_now_add=True)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="files", default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
 
     objects = FileManager()
 

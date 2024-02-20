@@ -102,8 +102,25 @@ def UploadFiles(request):
     return RJR(status=25)
 
 
+@csrf_exempt
 def DownloadFiles(request):
-    pass
+    data = json.loads(request.body)
+    username = data.get('username')
+    file_names = data.get('file_names', False)
+    if not file_names:
+        return RJR(status=13, msg='file_names should be non-empty array')
+    user = User.objects.get(username=username)
+    paths = []
+    FileDoesNotExist = []
+    for name in file_names:
+        try:
+            paths.append(user.files.get(name=name).file.path)
+        except ObjectDoesNotExist:
+            FileDoesNotExist.append(name)
+
+    return RJR(status=20, msg=f"{paths}")
+
+
 
     
 #    Folder.objects.create(
