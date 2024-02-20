@@ -39,50 +39,49 @@ def decode_token(token, secret_key):
 
 class TokenAuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if not request.path.startswith('/media/'):
-            if request.method != "POST":
-                return RJR(12)
-        pass
-#        bearer_header = request.headers.get('Authorization')
-#    
-#        if not bearer_header:
-#            return RJR(16)
-#    
-#        from_header = bearer_header.split(' ')[0]
-#        header_type = bearer_header.split(' ')[1]
-#        token = bearer_header.split(' ')[2]
-#    
-#        if from_header == 'server':
-#            if header_type == 'personal':
-#                local_personal_key = server_data.objects.get(personal_key='personal_key').personal_key
-#                return RJR(15) if local_personal_key != token else None
-#            else:
-#                secret_key = REDISKA.get('server_secret_key')
-#                secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil' else secret_key
-#                _, status = decode_token(token, secret_key)
-#                return RJR(status) if status != 22 else None
-#    
-#        elif from_header == 'user':
-#            node_UUID = os.environ.get('UUID')
-#            username = request.headers.get('username')
-#            if node_UUID is None or username is None:
-#                return RJR(status=13)
-#            data_to_send = {
-#                'username': username,
-#                'Bearer': token,
-#                'node_UUID': node_UUID,
-#            }
-#            response_data = send_data(data_to_send, 'TokenVerify')
-#            node_validate_status = response_data.get('node_validate_status', None)
-#            user_validate_status = response_data.get('user_validate_status', None)
-#            if node_validate_status != 22 or node_validate_status is None:
-#                node_connection()
-#                return RJR(31)
-#            if user_validate_status != 22 or user_validate_status is None:
-#                return RJR(user_validate_status)
-#    
-#            if User.objects.filter(username=username).exists() == False:
-#                User.objects.create_user(username)
+        if request.method != "POST":
+            return RJR(12)
+
+        bearer_header = request.headers.get('Authorization')
+    
+        if not bearer_header:
+            return RJR(16)
+    
+        from_header = bearer_header.split(' ')[0]
+        header_type = bearer_header.split(' ')[1]
+        token = bearer_header.split(' ')[2]
+    
+        if from_header == 'server':
+            if header_type == 'personal':
+                local_personal_key = server_data.objects.get(personal_key='personal_key').personal_key
+                return RJR(15) if local_personal_key != token else None
+            else:
+                secret_key = REDISKA.get('server_secret_key')
+                secret_key = sever_data.objects.get('secret_key') if secret_key == 'nil' else secret_key
+                _, status = decode_token(token, secret_key)
+                return RJR(status) if status != 22 else None
+    
+        elif from_header == 'user':
+            node_UUID = os.environ.get('UUID')
+            username = request.headers.get('username')
+            if node_UUID is None or username is None:
+                return RJR(status=13)
+            data_to_send = {
+                'username': username,
+                'Bearer': token,
+                'node_UUID': node_UUID,
+            }
+            response_data = send_data(data_to_send, 'TokenVerify')
+            node_validate_status = response_data.get('node_validate_status', None)
+            user_validate_status = response_data.get('user_validate_status', None)
+            if node_validate_status != 22 or node_validate_status is None:
+                node_connection()
+                return RJR(31)
+            if user_validate_status != 22 or user_validate_status is None:
+                return RJR(user_validate_status)
+    
+            if User.objects.filter(username=username).exists() == False:
+                User.objects.create_user(username)
 
 # make adding user token to redis?????
 # make adding user token to redis?????
