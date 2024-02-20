@@ -14,7 +14,8 @@ global status_list
 def RJR(status=False, response_data={}, msg=False, data=[]):
     response_data['status'] = status if status else "Success, or not success, that is the question"
     response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
-    response_data['data'] = data
+    if data:
+        response_data['data'] = data
     return JsonResponse(response_data)
 
 
@@ -81,20 +82,28 @@ def CreateFolder(request):
 
 
 @csrf_exempt
-def SaveFiles(request):
+def UploadFiles(request):
     parent = request.POST.get('parent')
     username = request.POST.get('username')
     files = request.FILES.getlist('user_files')
     user = User.objects.get(username=username)
     folder = user.folders.get(name=parent)
     if folder is None:
-        return RJR(status=13, msg="folder can not be none")
+        return RJR(status=13, msg=f"folder {parent} does not exist")
 
+    existed_files = []
     for file in files:
-        file_obj, created = File.objects.create_file(file=file, name=file.name, folder=folder)
+        _, created = File.objects.create_file(file=file, name=file.name, folder=folder)
+        if not created:
+            existed_file.append(file.name)
+    if existed_files:
+        return RJR(status=13, msg=f"this file(s) already exist(s): {', '.join(existed_files)}")
 
     return RJR(status=25)
 
+
+def DownloadFiles(request):
+    pass
 
     
 #    Folder.objects.create(
