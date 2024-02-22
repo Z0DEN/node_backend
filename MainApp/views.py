@@ -14,8 +14,6 @@ global status_list
 def RJR(status=False, response_data={}, msg=False, data=[]):
     response_data['status'] = status if status else "Success, or not success, that is the question"
     response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
-    if data:
-        response_data['data'] = data
     return JsonResponse(response_data)
 
 
@@ -62,7 +60,7 @@ def GetUserData(request):
                 'date_added': file.date_added,
             }
             user_files.append(file_data) 
-    return RJR(status=20, data=user_files)
+    return RJR(status=20, response_data['data']=user_files)
 
 
 @csrf_exempt
@@ -95,9 +93,9 @@ def UploadFiles(request):
     for file in files:
         _, created = File.objects.create_file(file=file, name=file.name, folder=folder)
         if not created:
-            existed_file.append(file.name)
+            existed_files.append(file.name)
     if existed_files:
-        return RJR(status=13, msg=f"this file(s) already exist(s): {', '.join(existed_files)}")
+        return RJR(status=13, response_data['existed_files']=existed_files, msg=f"this file(s) already exist(s): {', '.join(existed_files)}")
 
     return RJR(status=25)
 
