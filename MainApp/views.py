@@ -11,7 +11,7 @@ from .tokens import *
 global status_list
 
 
-def RJR(status=False, response_data={}, msg=False, data=[]):
+def RJR(status=False, response_data={}, msg=False):
     response_data['status'] = status if status else "Success, or not success, that is the question"
     response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
     return JsonResponse(response_data)
@@ -60,7 +60,7 @@ def GetUserData(request):
                 'date_added': file.date_added,
             }
             user_files.append(file_data) 
-    return RJR(status=20, response_data['data']=user_files)
+    return RJR(status=20,response_data={'data': user_files})
 
 
 @csrf_exempt
@@ -74,9 +74,9 @@ def CreateFolder(request):
 
     folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user)
     if not created:
-        return RJR(status=18)
+        return RJR(18)
     else:
-        return RJR(status=24)
+        return RJR(24)
 
 
 @csrf_exempt
@@ -94,16 +94,15 @@ def UploadFiles(request):
         _, created = File.objects.create_file(file=file, name=file.name, folder=folder)
         if not created:
             existed_files.append(file.name)
-    if existed_files:
-        return RJR(status=13, response_data['existed_files']=existed_files, msg=f"this file(s) already exist(s): {', '.join(existed_files)}")
 
-    return RJR(status=25)
+    if existed_files:
+        return RJR(status=18, response_data={'existed_files': existed_files})
+
+    return RJR(25)
 
 
 @csrf_exempt
 def DownloadFiles(request):
-    #file_path = '/storage/blesk42/24-241.txt'
-
     data = json.loads(request.body)
     username = data.get('username')
     file_name = data.get('file_name', False)
@@ -113,7 +112,7 @@ def DownloadFiles(request):
     try:
         file = user.files.get(name=file_name)
     except ObjectDoesNotExist:
-        return RJR(status=10, msg="file does not exist")
+        return RJR(status=13, msg="file does not exist")
 
     with open('output.txt', 'w') as print_file:
         print(file.file, file=print_file)

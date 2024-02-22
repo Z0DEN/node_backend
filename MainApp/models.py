@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.contrib.auth.models import AbstractBaseUser
 
 
@@ -8,8 +8,11 @@ def user_directory_path(instance, filename):
 
 class FileManager(models.Manager):
     def create_file(self, file, name, folder):
-        file, created = self.get_or_create(file=file, name=name, parent=folder.name, folder=folder)
-        return file, created
+        try:
+            file, created = self.get_or_create(file=file, name=name, parent=folder.name, folder=folder)
+            return file, created
+        except IntegrityError:
+            return None, False
 
 
     def create_folder(self, name, parent, user):
@@ -52,7 +55,7 @@ class Folder(models.Model):
 
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
-    name = models.CharField(max_length=256, default="file")
+    name = models.CharField(unique=True, max_length=256, default="file")
     parent = models.CharField(max_length=256, default='root')
     date_added = models.DateTimeField(auto_now_add=True)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name="files", default=1)
