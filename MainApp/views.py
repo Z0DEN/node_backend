@@ -37,18 +37,17 @@ def GetUserData(request):
     user = User.objects.get(username=username)
     user_files = []
     for folder in user.folders.all():
+        parents = list(folder.parents.all().values_list('name', flat=True))
         if not folder.is_root:
             folder_data = {
                 'type': 'folder',
                 'name': folder.name,
-                'parent': folder.parent,
+                'parent': parents,
                 'date_added': folder.date_added,
             }
             user_files.append(folder_data)
     for file in user.files.all():
-        parents = file.folders.all().values_list('name', flat=True)
-        with open('output.txt', 'w') as file:
-            print(parents, file=file)
+        parents = list(file.parents.all().values_list('name', flat=True))
         file_data = {
             'type': 'file',
             'name': file.name,
@@ -69,8 +68,9 @@ def CreateFolder(request):
         return RJR(13)
 
     user = User.objects.get(username=username)
+    parent = user.folders.get(name=folder_parent)
 
-    folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user, is_root=False)
+    folder, created = user.folders.create_folder(name=folder_name, parent=parent, user=user, is_root=False)
 
     if not created:
         return RJR(18)
@@ -90,7 +90,7 @@ def UploadFiles(request):
 
     existed_files = []
     for file in files:
-        _, created = File.objects.create_file(file=file, folder=folder)
+        _, created = File.objects.create_file(file=file, folder=folder, user=user)
 
         if not created:
             existed_files.append(file.name)

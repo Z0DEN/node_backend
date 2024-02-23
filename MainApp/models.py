@@ -3,13 +3,13 @@ from django.contrib.auth.models import AbstractBaseUser
 
 
 def user_directory_path(instance, filename):
-    return f'{instance.folder.user.username}/{filename}'
+    return f'{instance.user.username}/{filename}'
 
 
 class FileManager(models.Manager):
-    def create_file(self, file, folder):
+    def create_file(self, file, folder, user):
         try:
-            file_instance = self.create(file=file, name=file.name, user=folder.user)
+            file_instance = self.create(file=file, name=file.name, user=user)
             file_instance.parents.add(folder)
             return file_instance, True
         except IntegrityError as e:
@@ -17,7 +17,11 @@ class FileManager(models.Manager):
 
 
     def create_folder(self, name, parent, user, is_root):
-        folder, created = self.get_or_create(name=name, parent=parent, user=user, is_root=is_root)
+        folder_exists = user.folders.filter(name=name, parents__name=parent).exists()
+        if folder_exists:
+            return None, False
+        folder, created = self.get_or_create(name=name, user=user, is_root=is_root)
+        folder.parents.add(parent)
         return folder, created
 
 
@@ -42,7 +46,7 @@ class User(models.Model):
 
 class Folder(models.Model):
     name = models.CharField(max_length=256, null=True, default=None)
-    parent = models.CharField(max_length=256, null=True, default='Folder')
+    parents = models.ManyToManyField('Folder', related_name="child_folders")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders", default=1)
     date_added = models.DateTimeField(auto_now_add=True)
     is_root = models.BooleanField(default=True)
@@ -56,7 +60,7 @@ class Folder(models.Model):
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
-    parents = models.ManyToManyField(Folder, related_name="files")
+    parents = models.ManyToManyField(Folder, related_name="child_files")
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
     objects = FileManager()
