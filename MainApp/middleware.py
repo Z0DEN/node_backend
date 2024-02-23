@@ -114,7 +114,7 @@ STATUS_LIST = {
     23: "Data successfully changed. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
-    31: "Something goes wrong, try again. ", 
+    31: "Something went wrong, try again. ", 
     # ------------------------------------------------------------- #
     40: "Undefined info. ",
 }

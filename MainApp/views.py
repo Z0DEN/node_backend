@@ -19,7 +19,6 @@ def RJR(status=False, response_data={}, msg=False):
 
 @csrf_exempt
 def AddUser(request):
-    print('start adding user')
     username = json.loads(request.body)['username']
 
     if not username:
@@ -27,15 +26,8 @@ def AddUser(request):
     if User.objects.filter(username=username).exists():
         return RJR(17)
 
-    new_user = User(
-            username = username,
-    )
-    new_user.save()
-#    print(new_user)
-#    user_dir = os.path.join("/storage", username)
-#    print(user_dir)
-#    os.makedirs(user_dir)
-    
+    new_user = User.create_user(username=username)
+
     return RJR(21)
 
 @csrf_exempt
@@ -45,21 +37,25 @@ def GetUserData(request):
     user = User.objects.get(username=username)
     user_files = []
     for folder in user.folders.all():
-        folder_data = {
-            'type': 'folder',
-            'name': folder.name,
-            'parent': folder.parent,
-            'date_added': folder.date_added,
-        }
-        user_files.append(folder_data)
-        for file in folder.files.all():
-            file_data = {
-                'type': 'file',
-                'name': file.name,
-                'parent': file.parent,
-                'date_added': file.date_added,
+        if not folder.is_root:
+            folder_data = {
+                'type': 'folder',
+                'name': folder.name,
+                'parent': folder.parent,
+                'date_added': folder.date_added,
             }
-            user_files.append(file_data) 
+            user_files.append(folder_data)
+    for file in user.files.all():
+        parents = file.folders.all().values_list('name', flat=True)
+        with open('output.txt', 'w') as file:
+            print(parents, file=file)
+        file_data = {
+            'type': 'file',
+            'name': file.name,
+            'parent': parents,
+            'date_added': file.date_added,
+        }
+        user_files.append(file_data) 
     return RJR(status=20,response_data={'data': user_files})
 
 
@@ -67,12 +63,15 @@ def GetUserData(request):
 def CreateFolder(request):
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
-    folder_parent = data.get('folder_parent', None)
+    folder_parent = data.get('folder_parent', 0)
     username = data.get('username')
-    
+    if folder_name is None or folder_parent == 0:
+        return RJR(13)
+
     user = User.objects.get(username=username)
 
-    folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user)
+    folder, created = user.folders.create_folder(name=folder_name, parent=folder_parent, user=user, is_root=False)
+
     if not created:
         return RJR(18)
     else:
@@ -91,7 +90,8 @@ def UploadFiles(request):
 
     existed_files = []
     for file in files:
-        _, created = File.objects.create_file(file=file, name=file.name, folder=folder)
+        _, created = File.objects.create_file(file=file, folder=folder)
+
         if not created:
             existed_files.append(file.name)
 
@@ -121,19 +121,6 @@ def DownloadFiles(request):
 
 
 
-
-#    with open(path, 'rb') as file:
-#        response = FileResponse(file, content_type='application/octet-stream')
-#        response['Content-Disposition'] = f'inline; filename={file_name}'
-#        return response
-
-
-    
-#    Folder.objects.create(
-#        username=new_user,
-#        FolderName="None",
-#        FolderParent="None",
-#    )
 
 
 # ------------------------------------------------------------- #
