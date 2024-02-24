@@ -8,22 +8,22 @@ def user_directory_path(instance, filename):
 
 
 class FileManager(models.Manager):
-    def create_file(self, file, folder, user):
+    def create_file(self, file, folder, item_id, user):
         try:
-            with open('output.txt', 'w') as print_file:
-                print(file, folder, user, file=print_file)
-            file_instance = self.create(file=file, name=file.name, user=user)
+#            with open('output.txt', 'w') as print_file:
+#                print(file, folder, item_id, user, file=print_file)
+            file_instance = self.create(file=file, name=file.name, item_id=item_id, user=user)
             file_instance.parent_id.add(folder)
             return file_instance, True
         except IntegrityError as e:
             return None, False
 
 
-    def create_folder(self, name, parent_id, folder_id, user):
+    def create_folder(self, name, parent_id, item_id, user):
         folder_exists = user.folders.filter(name=name, parent_id=parent_id).exists()
         if folder_exists:
             return None, False
-        folder = self.create(name=name, parent_id=parent_id, folder_id=folder_id, user=user)
+        folder = self.create(name=name, parent_id=parent_id, item_id=item_id, user=user)
         return folder, True 
 
 
@@ -32,7 +32,7 @@ class UserManager(models.Manager):
         if User.objects.filter(username=username).exists():
             return None
         user = self.create(username=username)
-        user.folders.create_folder(name=None, parent_id=None, folder_id=None, user=user)
+        user.folders.create_folder(name=None, parent_id=None, item_id=None, user=user)
         return user
 
 
@@ -51,7 +51,7 @@ class User(models.Model):
 class Folder(models.Model):
     name = models.CharField(max_length=256, null=True, default=None)
     parent_id = models.CharField(max_length=256, null=True, default=None)
-    folder_id = models.CharField(max_length=256, null=True, default=None)
+    item_id = models.CharField(max_length=256, null=True, default=None)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders", default=1)
     date_added = models.DateTimeField(auto_now_add=True)
 
@@ -64,6 +64,7 @@ class Folder(models.Model):
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
+    item_id = models.CharField(max_length=256, null=True, default=None)
     parent_id = models.ManyToManyField(Folder, related_name="child_files")
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)

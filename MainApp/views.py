@@ -41,13 +41,13 @@ def GetUserData(request):
             folder_data = {
                 'type': 'folder',
                 'name': folder.name,
-                'folder_id': folder.folder_id,
+                'item_id': folder.item_id,
                 'parent_id': [folder.parent_id],
                 'date_added': folder.date_added,
             }
             user_files.append(folder_data)
     for file in user.files.all():
-        parents = list(file.parent_id.all().values_list('folder_id', flat=True))
+        parents = list(file.parent_id.all().values_list('item_id', flat=True))
         file_data = {
             'type': 'file',
             'name': file.name,
@@ -62,15 +62,15 @@ def GetUserData(request):
 def CreateFolder(request):
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
-    folder_id = data.get('folder_id', None)
+    item_id = data.get('item_id', None)
     parent_id = data.get('parent_id', True)
     username = data.get('username')
-    if folder_name is None or parent_id is True or folder_id is None:
+    if folder_name is None or parent_id is True or item_id is None:
         return RJR(13)
 
     user = User.objects.get(username=username)
 
-    _, created = user.folders.create_folder(name=folder_name, parent_id=parent_id, folder_id=folder_id, user=user)
+    _, created = user.folders.create_folder(name=folder_name, parent_id=parent_id, item_id=item_id, user=user)
 
     if not created:
         return RJR(18, msg=folder_name)
@@ -85,16 +85,18 @@ def UploadFiles(request):
     files = request.FILES.getlist('user_files')
     if parent_id == 'null':
         parent_id = None
-    with open('output.txt', 'w') as file:
-        print(type(parent_id), file=file)
     user = User.objects.get(username=username)
-    folder = user.folders.get(folder_id=parent_id)
+    folder = user.folders.get(item_id=parent_id)
     if folder is None:
         return RJR(status=13)
 
     existed_files = []
-    for file in files:
-        instance, created = user.files.create_file(file=file, folder=folder, user=user)
+    for file_item in files:
+        item_id = file_item['item_id']
+        file = file_item['file']
+        with open('output.txt', 'w') as print_file:
+            print(file, item_id, file=print_file)
+        instance, created = user.files.create_file(file=file, folder=folder, item_id=item_id, user=user)
         if not created:
             existed_files.append(file.name)
 
