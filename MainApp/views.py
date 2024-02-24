@@ -93,9 +93,7 @@ def UploadFiles(request):
     existed_files = []
     for file in files:
         item_id = request.POST.get(file.name)
-        with open('output.txt', 'w') as print_file:
-            print(item_id, file=print_file)
-        instance, created = user.files.create_file(file=file, folder=folder, item_id=item_id, user=user)
+        _, created = user.files.create_file(file=file, folder=folder, item_id=item_id, user=user)
         if not created:
             existed_files.append(file.name)
 
