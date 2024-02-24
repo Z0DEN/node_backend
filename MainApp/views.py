@@ -8,12 +8,12 @@ from .node_auth import node_connection
 from .tokens import *
 
 
-global status_list
+global STATUS_LIST
 
 
 def RJR(status=False, response_data={}, msg=False):
-    response_data['status'] = status if status else "Success, or not success, that is the question"
-    response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
+    response_data['status'] = status if status else None
+    response_data['msg'] = STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "Success, or not success, that is the question"
     return JsonResponse(response_data)
 
 
@@ -37,17 +37,17 @@ def GetUserData(request):
     user = User.objects.get(username=username)
     user_files = []
     for folder in user.folders.all():
-        parents = list(folder.parents.all().values_list('name', flat=True))
-        if not folder.is_root:
+        if folder.name is not None:
             folder_data = {
                 'type': 'folder',
                 'name': folder.name,
-                'parent': parents,
+                'folder_id': folder.folder_id,
+                'parent_id': list(folder.parent_id),
                 'date_added': folder.date_added,
             }
             user_files.append(folder_data)
     for file in user.files.all():
-        parents = list(file.parents.all().values_list('name', flat=True))
+        parents = list(file.parents.all().values_list('folder_id', flat=True))
         file_data = {
             'type': 'file',
             'name': file.name,
@@ -55,25 +55,25 @@ def GetUserData(request):
             'date_added': file.date_added,
         }
         user_files.append(file_data) 
-    return RJR(status=20,response_data={'data': user_files})
+    return RJR(status=20, response_data={'data': user_files})
 
 
 @csrf_exempt
 def CreateFolder(request):
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
-    folder_parent = data.get('folder_parent', 0)
+    folder_id = data.get('folder_id', None)
+    folder_parent_id = data.get('folder_parent_id', None)
     username = data.get('username')
-    if folder_name is None or folder_parent == 0:
+    if folder_name is None or folder_parent_id is None or folder_id is None:
         return RJR(13)
 
     user = User.objects.get(username=username)
-    parent = user.folders.get(name=folder_parent)
 
-    folder, created = user.folders.create_folder(name=folder_name, parent=parent, user=user, is_root=False)
+    _, created = user.folders.create_folder(name=folder_name, parent_id=folder_parent_id, folder_id=folder_id, user=user)
 
     if not created:
-        return RJR(18)
+        return RJR(18, msg=folder_name)
     else:
         return RJR(24)
 
@@ -96,7 +96,7 @@ def UploadFiles(request):
             existed_files.append(file.name)
 
     if existed_files:
-        return RJR(status=18, response_data={'existed_files': existed_files})
+        return RJR(status=18, msg=', '.join(existed_files), response_data={'existed_files': existed_files})
 
     return RJR(25)
 
@@ -131,7 +131,7 @@ def DownloadFiles(request):
 #   3<..>  -> Warning
 #   4<..>  -> Info
 
-status_list = {
+STATUS_LIST = {
     10: "Undefined error. ",
     11: "Node already exists. ",
     12: "Invalid request method. ",
@@ -140,13 +140,13 @@ status_list = {
     15: "Invalid Token. ",
     16: "Request have no auth token (Bearer). ",
     17: "User already exist. ", 
-    18: 'Folder or file already exist. ',
+    18: 'Folder or file with these names already exist: ',
     # ------------------------------------------------------------- #
     20: "Undefined success. ",
     21: "Node or user was successfully created. ",
     22: "Token is Valid. ",
     23: "Data successfully changed. ",
-    24: "Folder or file was successfully created. ",
+    24: "Folder was successfully created. ",
     25: "Files was successfully saved. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",

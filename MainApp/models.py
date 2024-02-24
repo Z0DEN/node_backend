@@ -1,3 +1,4 @@
+import uuid
 from django.db import models, IntegrityError
 from django.contrib.auth.models import AbstractBaseUser
 
@@ -16,19 +17,20 @@ class FileManager(models.Manager):
             return None, False
 
 
-    def create_folder(self, name, parent, user, is_root):
-        folder_exists = user.folders.filter(name=name, parents__name=parent).exists()
+    def create_folder(self, name, parent_id, folder_id, user):
+        folder_exists = user.folders.filter(name=name, parent_id=parent_id).exists()
         if folder_exists:
             return None, False
-        folder, created = self.get_or_create(name=name, user=user, is_root=is_root)
-        folder.parents.add(parent)
-        return folder, created
+        folder = self.create(name=name, parent_id=parent_id, folder_id=folder_id, user=user)
+        return folder, True 
 
 
 class UserManager(models.Manager):
     def create_user(self, username):
+        if User.objects.filter(username=username).exists():
+            return None
         user = self.create(username=username)
-        user.folders.create_folder(name=None, parent=None, user=user, is_root=True)
+        user.folders.create_folder(name=None, parent_id=None, folder_id=None, user=user)
         return user
 
 
@@ -46,10 +48,10 @@ class User(models.Model):
 
 class Folder(models.Model):
     name = models.CharField(max_length=256, null=True, default=None)
-    parents = models.ManyToManyField('Folder', related_name="child_folders")
+    parent_id = models.CharField(max_length=256, null=True, default=None)
+    folder_id = models.CharField(max_length=256, null=True, default=None)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="folders", default=1)
     date_added = models.DateTimeField(auto_now_add=True)
-    is_root = models.BooleanField(default=True)
 
     objects = FileManager()
 

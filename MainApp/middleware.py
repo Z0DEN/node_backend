@@ -17,11 +17,10 @@ REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
-def RJR(status=False, msg=False):
-    response_data = {
-        "status": status if status else None,
-        "msg": STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "Success, or not success, that is the question",
-    }
+    
+def RJR(status=False, response_data={}, msg=False):
+    response_data['status'] = status if status else None
+    response_data['msg'] = STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "Success, or not success, that is the question"
     return JsonResponse(response_data)
 
 
