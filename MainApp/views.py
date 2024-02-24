@@ -42,16 +42,16 @@ def GetUserData(request):
                 'type': 'folder',
                 'name': folder.name,
                 'folder_id': folder.folder_id,
-                'parent_id': list(folder.parent_id),
+                'parent_id': [folder.parent_id],
                 'date_added': folder.date_added,
             }
             user_files.append(folder_data)
     for file in user.files.all():
-        parents = list(file.parents.all().values_list('folder_id', flat=True))
+        parents = list(file.parent_id.all().values_list('folder_id', flat=True))
         file_data = {
             'type': 'file',
             'name': file.name,
-            'parent': parents,
+            'parent_id': parents,
             'date_added': file.date_added,
         }
         user_files.append(file_data) 
@@ -63,14 +63,14 @@ def CreateFolder(request):
     data = json.loads(request.body)
     folder_name = data.get('folder_name', None)
     folder_id = data.get('folder_id', None)
-    folder_parent_id = data.get('folder_parent_id', None)
+    parent_id = data.get('parent_id', True)
     username = data.get('username')
-    if folder_name is None or folder_parent_id is None or folder_id is None:
+    if folder_name is None or parent_id is True or folder_id is None:
         return RJR(13)
 
     user = User.objects.get(username=username)
 
-    _, created = user.folders.create_folder(name=folder_name, parent_id=folder_parent_id, folder_id=folder_id, user=user)
+    _, created = user.folders.create_folder(name=folder_name, parent_id=parent_id, folder_id=folder_id, user=user)
 
     if not created:
         return RJR(18, msg=folder_name)
@@ -80,18 +80,21 @@ def CreateFolder(request):
 
 @csrf_exempt
 def UploadFiles(request):
-    parent = request.POST.get('parent')
+    parent_id = request.POST.get('parent_id')
     username = request.POST.get('username')
     files = request.FILES.getlist('user_files')
+    if parent_id == 'null':
+        parent_id = None
+    with open('output.txt', 'w') as file:
+        print(type(parent_id), file=file)
     user = User.objects.get(username=username)
-    folder = user.folders.get(name=parent)
+    folder = user.folders.get(folder_id=parent_id)
     if folder is None:
-        return RJR(status=13, msg=f"folder {parent} does not exist")
+        return RJR(status=13)
 
     existed_files = []
     for file in files:
-        _, created = File.objects.create_file(file=file, folder=folder, user=user)
-
+        instance, created = user.files.create_file(file=file, folder=folder, user=user)
         if not created:
             existed_files.append(file.name)
 

@@ -10,8 +10,10 @@ def user_directory_path(instance, filename):
 class FileManager(models.Manager):
     def create_file(self, file, folder, user):
         try:
+            with open('output.txt', 'w') as print_file:
+                print(file, folder, user, file=print_file)
             file_instance = self.create(file=file, name=file.name, user=user)
-            file_instance.parents.add(folder)
+            file_instance.parent_id.add(folder)
             return file_instance, True
         except IntegrityError as e:
             return None, False
@@ -62,7 +64,7 @@ class Folder(models.Model):
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
-    parents = models.ManyToManyField(Folder, related_name="child_files")
+    parent_id = models.ManyToManyField(Folder, related_name="child_files")
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
     objects = FileManager()
