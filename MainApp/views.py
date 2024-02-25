@@ -35,27 +35,29 @@ def GetUserData(request):
     data = json.loads(request.body)
     username = data.get('username', None)
     user = User.objects.get(username=username)
-    user_files = []
-    for folder in user.folders.all():
-        if folder.name is not None:
-            folder_data = {
-                'type': 'folder',
-                'name': folder.name,
-                'item_id': folder.item_id,
-                'parent_id': [folder.parent_id],
-                'date_added': folder.date_added,
-            }
-            user_files.append(folder_data)
-    for file in user.files.all():
-        parents = list(file.parent_id.all().values_list('item_id', flat=True))
-        file_data = {
-            'type': 'file',
-            'name': file.name,
-            'parent_id': parents,
-            'date_added': file.date_added,
-        }
-        user_files.append(file_data) 
-    return RJR(status=20, response_data={'data': user_files})
+    user_data = []
+    user_files = user.get_files()
+    user_folders = user.get_folders()
+    user_data.extend(user_files + user_folders)
+#    for folder in user.folders.all():
+#        if folder.name is not None:
+#            folder_data = {
+#                'type': 'folder',
+#                'name': folder.name,
+#                'item_id': folder.item_id,
+#                'parent_id': [folder.parent_id],
+#                'date_added': folder.date_added,
+#            }
+#            user_files.append(folder_data)
+#    for file in user.files.all():
+#        file_data = {
+#            'type': 'file',
+#            'name': file.name,
+#            'parent_id': file.parent_id,
+#            'date_added': file.date_added,
+#        }
+#        user_files.append(file_data) 
+    return RJR(status=20, response_data={'data': user_data})
 
 
 @csrf_exempt
@@ -83,19 +85,13 @@ def UploadFiles(request):
     parent_id = request.POST.get('parent_id')
     username = request.POST.get('username')
     files = request.FILES.getlist('user_files')
-    if parent_id == 'null':
-        parent_id = None
-    user = User.objects.get(username=username)
-    folder = user.folders.get(item_id=parent_id)
-    if folder is None:
-        return RJR(status=13)
 
     existed_files = []
     for file in files:
         item_id = request.POST.get(file.name)
-        _, created = user.files.create_file(file=file, folder=folder, item_id=item_id, user=user)
+        _, created = user.files.create_file(file=file, item_id=item_id, parent_id=parent_id, username=username)
         if not created:
-            existed_files.append(file.name)
+            existed_files.append(item_id)
 
     if existed_files:
         return RJR(status=18, msg=', '.join(existed_files), response_data={'existed_files': existed_files})

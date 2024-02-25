@@ -1,5 +1,6 @@
 import uuid
 from django.db import models, IntegrityError
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractBaseUser
 
 
@@ -8,16 +9,24 @@ def user_directory_path(instance, filename):
 
 
 class FileManager(models.Manager):
-    def create_file(self, file, folder, item_id, user):
+    def create_file(self, file, item_id, parent_id, username):
+        user = User.objects.get(username=username)
+        if parent_id == 'null':
+            parent_id = None
         try:
-#            with open('output.txt', 'w') as print_file:
-#                print(file, folder, item_id, user, file=print_file)
-            file_instance = self.create(file=file, name=file.name, item_id=item_id, user=user)
-            file_instance.parent_id.add(folder)
+            file_instance = self.create(file=file, name=file.name, item_id=item_id, parent_id=[parent_id], user=user)
             return file_instance, True
         except IntegrityError as e:
             return None, False
 
+
+    def add_parent(item_id, parent_id, user):
+        file_instance = user.files.get(item_id=item_id)
+        parent_list = file_instance.parent_id
+        parent_list.append(parent_id)
+        file_instance.parent_id = parent_list
+        file_instance.save()
+        
 
     def create_folder(self, name, parent_id, item_id, user):
         folder_exists = user.folders.filter(name=name, parent_id=parent_id).exists()
@@ -34,6 +43,34 @@ class UserManager(models.Manager):
         user = self.create(username=username)
         user.folders.create_folder(name=None, parent_id=None, item_id=None, user=user)
         return user
+
+
+    def get_folders():
+        user_folders = []
+        for folder in user.folders.all():
+            if folder.name is not None:
+                folder_data = {
+                    'type': 'folder',
+                    'name': folder.name,
+                    'item_id': folder.item_id,
+                    'parent_id': [folder.parent_id],
+                    'date_added': folder.date_added,
+                }
+                user_folders.append(folder_data)
+        return user_folders
+
+
+    def get_files():
+        user_files = []
+        for file in user.files.all():
+            file_data = {
+                'type': 'file',
+                'name': file.name,
+                'parent_id': file.parent_id,
+                'date_added': file.date_added,
+            }
+            user_files.append(file_data) 
+        return user_files
 
 
 # ---------------------------------------------------------------------------------------------------- #
@@ -65,7 +102,7 @@ class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
     item_id = models.CharField(max_length=256, null=True, default=None)
-    parent_id = models.ManyToManyField(Folder, related_name="child_files")
+    parent_id = models.JSONField(blank=True, null=True, default=list)
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
     objects = FileManager()
