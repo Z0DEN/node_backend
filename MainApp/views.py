@@ -36,9 +36,12 @@ def GetUserData(request):
     username = data.get('username', None)
     user = User.objects.get(username=username)
     user_data = []
-    user_files = user.get_files()
     user_folders = user.get_folders()
+    user_files = user.get_files()
     user_data.extend(user_files + user_folders)
+    with open('output.txt', 'w') as file:
+        print(user_folders, user_files, user_data, file=file)
+
 #    for folder in user.folders.all():
 #        if folder.name is not None:
 #            folder_data = {
@@ -72,7 +75,7 @@ def CreateFolder(request):
 
     user = User.objects.get(username=username)
 
-    _, created = user.folders.create_folder(name=folder_name, parent_id=parent_id, item_id=item_id, user=user)
+    _, created = user.folders.create_folder(name=folder_name, parent_id=parent_id, item_id=item_id)
 
     if not created:
         return RJR(18, msg=folder_name)
@@ -85,11 +88,12 @@ def UploadFiles(request):
     parent_id = request.POST.get('parent_id')
     username = request.POST.get('username')
     files = request.FILES.getlist('user_files')
+    user = User.objects.get(username=username)
 
     existed_files = []
     for file in files:
         item_id = request.POST.get(file.name)
-        _, created = user.files.create_file(file=file, item_id=item_id, parent_id=parent_id, username=username)
+        _, created = user.files.create_file(file=file, item_id=item_id, parent_id=parent_id)
         if not created:
             existed_files.append(item_id)
 

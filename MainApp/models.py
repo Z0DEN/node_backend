@@ -9,11 +9,11 @@ def user_directory_path(instance, filename):
 
 
 class FileManager(models.Manager):
-    def create_file(self, file, item_id, parent_id, username):
-        user = User.objects.get(username=username)
+    def create_file(self, file, item_id, parent_id):
         if parent_id == 'null':
             parent_id = None
         try:
+            user = self.instance
             file_instance = self.create(file=file, name=file.name, item_id=item_id, parent_id=[parent_id], user=user)
             return file_instance, True
         except IntegrityError as e:
@@ -28,7 +28,8 @@ class FileManager(models.Manager):
         file_instance.save()
         
 
-    def create_folder(self, name, parent_id, item_id, user):
+    def create_folder(self, name, parent_id, item_id):
+        user = self.instance
         folder_exists = user.folders.filter(name=name, parent_id=parent_id).exists()
         if folder_exists:
             return None, False
@@ -45,9 +46,33 @@ class UserManager(models.Manager):
         return user
 
 
-    def get_folders():
+
+
+# ---------------------------------------------------------------------------------------------------- #
+
+class User(models.Model):
+    username = models.CharField(unique=True, max_length=255)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    objects = UserManager()
+
+
+    def get_files(self):
+        user_files = []
+        for file in self.files.all():
+            file_data = {
+                'type': 'file',
+                'name': file.name,
+                'parent_id': file.parent_id,
+                'date_added': file.date_added,
+            }
+            user_files.append(file_data) 
+        return user_files
+
+
+    def get_folders(self):
         user_folders = []
-        for folder in user.folders.all():
+        for folder in self.folders.all():
             if folder.name is not None:
                 folder_data = {
                     'type': 'folder',
@@ -59,27 +84,6 @@ class UserManager(models.Manager):
                 user_folders.append(folder_data)
         return user_folders
 
-
-    def get_files():
-        user_files = []
-        for file in user.files.all():
-            file_data = {
-                'type': 'file',
-                'name': file.name,
-                'parent_id': file.parent_id,
-                'date_added': file.date_added,
-            }
-            user_files.append(file_data) 
-        return user_files
-
-
-# ---------------------------------------------------------------------------------------------------- #
-
-class User(models.Model):
-    username = models.CharField(unique=True, max_length=255)
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    objects = UserManager()
 
     def __str__(self):
         return self.username
@@ -105,6 +109,7 @@ class File(models.Model):
     parent_id = models.JSONField(blank=True, null=True, default=list)
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
+
     objects = FileManager()
 
     def __str__(self):
