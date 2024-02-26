@@ -10,17 +10,18 @@ def user_directory_path(instance, filename):
 
 class FileManager(models.Manager):
     def create_file(self, file, item_id, parent_id):
+        user = self.instance
         if parent_id == 'null':
             parent_id = None
         try:
-            user = self.instance
             file_instance = self.create(file=file, name=file.name, item_id=item_id, parent_id=[parent_id], user=user)
             return file_instance, True
         except IntegrityError as e:
             return None, False
 
 
-    def add_parent(item_id, parent_id, user):
+    def add_parent(item_id, parent_id):
+        user = self.instance
         file_instance = user.files.get(item_id=item_id)
         parent_list = file_instance.parent_id
         parent_list.append(parent_id)
@@ -42,7 +43,6 @@ class UserManager(models.Manager):
         if User.objects.filter(username=username).exists():
             return None
         user = self.create(username=username)
-        user.folders.create_folder(name=None, parent_id=None, item_id=None, user=user)
         return user
 
 
@@ -73,15 +73,14 @@ class User(models.Model):
     def get_folders(self):
         user_folders = []
         for folder in self.folders.all():
-            if folder.name is not None:
-                folder_data = {
-                    'type': 'folder',
-                    'name': folder.name,
-                    'item_id': folder.item_id,
-                    'parent_id': [folder.parent_id],
-                    'date_added': folder.date_added,
-                }
-                user_folders.append(folder_data)
+            folder_data = {
+                'type': 'folder',
+                'name': folder.name,
+                'item_id': folder.item_id,
+                'parent_id': [folder.parent_id],
+                'date_added': folder.date_added,
+            }
+            user_folders.append(folder_data)
         return user_folders
 
 
@@ -105,8 +104,8 @@ class Folder(models.Model):
 class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
-    item_id = models.CharField(max_length=256, null=True, default=None)
-    parent_id = models.JSONField(blank=True, null=True, default=list)
+    item_id = models.CharField(unique=True, max_length=256, null=True, default=None)
+    parent_id = models.JSONField(unique=True, blank=True, null=True, default=list)
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
 

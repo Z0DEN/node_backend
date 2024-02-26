@@ -35,31 +35,13 @@ def GetUserData(request):
     data = json.loads(request.body)
     username = data.get('username', None)
     user = User.objects.get(username=username)
-    user_data = []
+
     user_folders = user.get_folders()
     user_files = user.get_files()
-    user_data.extend(user_files + user_folders)
-    with open('output.txt', 'w') as file:
-        print(user_folders, user_files, user_data, file=file)
 
-#    for folder in user.folders.all():
-#        if folder.name is not None:
-#            folder_data = {
-#                'type': 'folder',
-#                'name': folder.name,
-#                'item_id': folder.item_id,
-#                'parent_id': [folder.parent_id],
-#                'date_added': folder.date_added,
-#            }
-#            user_files.append(folder_data)
-#    for file in user.files.all():
-#        file_data = {
-#            'type': 'file',
-#            'name': file.name,
-#            'parent_id': file.parent_id,
-#            'date_added': file.date_added,
-#        }
-#        user_files.append(file_data) 
+    user_data = []
+    user_data.extend(user_files + user_folders)
+
     return RJR(status=20, response_data={'data': user_data})
 
 
@@ -89,6 +71,8 @@ def UploadFiles(request):
     username = request.POST.get('username')
     files = request.FILES.getlist('user_files')
     user = User.objects.get(username=username)
+    if files is None:
+        return RJR(13)
 
     existed_files = []
     for file in files:
