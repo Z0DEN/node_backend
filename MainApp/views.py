@@ -11,10 +11,11 @@ from .tokens import *
 global STATUS_LIST
 
 
-def RJR(status=False, response_data={}, msg=False):
+def RJR(status=False, msg=False, response_data={}, headers={}):
     response_data['status'] = status if status else None
     response_data['msg'] = STATUS_LIST[status] + msg if status and msg else STATUS_LIST[status] or msg if status or msg else "Success, or not success, that is the question"
-    return JsonResponse(response_data)
+    
+    return JsonResponse(response_data, headers=headers)
 
 
 @csrf_exempt
@@ -91,19 +92,18 @@ def UploadFiles(request):
 def DownloadFiles(request):
     data = json.loads(request.body)
     username = data.get('username')
-    file_name = data.get('file_name', False)
-    if not file_name:
-        return RJR(status=13, msg='file_name should be non-empty string')
+    item_id = data.get('item_id', False)
+    if not item_id:
+        return RJR(status=13, msg='item_id should be non-empty string')
+
     user = User.objects.get(username=username)
     try:
-        file = user.files.get(name=file_name)
+        file = user.files.get(item_id=item_id)
     except ObjectDoesNotExist:
         return RJR(status=13, msg="file does not exist")
-
-    with open('output.txt', 'w') as print_file:
-        print(file.file, file=print_file)
-
-    return FileResponse(file.file, as_attachment=True, filename=file.name)
+    
+    file_response = FileResponse(file.file, as_attachment=True, filename=file.name, headers={'isFiles':True})
+    return file_response 
 
 
 

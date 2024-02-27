@@ -63,6 +63,7 @@ class User(models.Model):
             file_data = {
                 'type': 'file',
                 'name': file.name,
+                'item_id': file.item_id,
                 'parent_id': file.parent_id,
                 'date_added': file.date_added,
             }
@@ -105,7 +106,7 @@ class File(models.Model):
     file = models.FileField(upload_to=user_directory_path)
     name = models.CharField(max_length=256, default="file")
     item_id = models.CharField(unique=True, max_length=256, null=True, default=None)
-    parent_id = models.JSONField(unique=True, blank=True, null=True, default=list)
+    parent_id = models.JSONField(blank=True, null=True, default=list)
     date_added = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
 

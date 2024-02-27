@@ -218,6 +218,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://192.168.0.98',
 ]
 
+CORS_EXPOSE_HEADERS = ['*']
+
 CORS_ALLOW_METHODS = (
     "DELETE",
     "GET",
