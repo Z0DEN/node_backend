@@ -103,19 +103,22 @@ class Folder(models.Model):
     objects = FileManager()
 
 
-    def delete_folder(self):
+    def delete(self, *args, **kwargs):
         try:
             child_folders = Folder.objects.filter(user=self.user, parent_id=self.item_id)
             for folder in child_folders:
-                folder.delete_folder()
+                folder.delete()
 
             files = File.objects.filter(user=self.user, parent_id__contains=[self.item_id])
             for file in files:
+                with open('output.txt', 'a') as f:
+                    print(file.name, file=f)
+
                 file.delete()
         except Exception as e:
             raise FolderDeletionError(f"{self.name}")
         else:
-            self.delete()
+            super().delete(*args, **kwargs)
 
         return       
     
