@@ -10,7 +10,7 @@ urlpatterns = [
     path('AddUser/', views.AddUser, name='AddUser'),
     path('GetUserData/', views.GetUserData, name='GetUserData'),
     path('CreateFolder/', views.CreateFolder, name='CreateFolder'),
-    path('DeleteItem', views.DeleteItem, name='DeleteItem'),
+    path('DeleteItem/', views.DeleteItem, name='DeleteItem'),
     path('UploadFiles/', views.UploadFiles, name='UploadFiles'),
     path('DownloadFiles/', views.DownloadFiles, name='DownloadFiles'),
     path('UpdateNodeTokens/', node_auth.UpdateNodeTokens),
