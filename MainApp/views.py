@@ -106,6 +106,26 @@ def DownloadFiles(request):
     return file_response 
 
 
+@csrf_exempt
+def DeleteFolder(request):
+    data = json.loads(request.body)
+    username = data.get('username')
+    item_id = data.get('item_id', False)
+    if not item_id:
+        return RJR(status=13, msg='item_id should be non-empty string')
+
+    user = User.objects.get(username=username)
+    try:
+        folder = user.folders.get(item_id=item_id)
+    except ObjectDoesNotExist:
+        return RJR(status=13, msg="folder does not exist")
+    
+    try:
+        folder.delete_folder()
+    except FolderDeletionError as e:
+        return RJR(status=10, msg=f"Error occurs while deletion folder: {e}")
+    else:
+        return RJR(status=20, msg="Folder was deleted successfully")
 
 
 

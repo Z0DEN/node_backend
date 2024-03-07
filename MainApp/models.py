@@ -8,6 +8,10 @@ def user_directory_path(instance, filename):
     return f'{instance.user.username}/{filename}'
 
 
+class FolderDeletionError(Exception):
+    pass
+
+
 class FileManager(models.Manager):
     def create_file(self, file, item_id, parent_id):
         user = self.instance
@@ -98,8 +102,36 @@ class Folder(models.Model):
 
     objects = FileManager()
 
-    def __str__(self):
-        return self.name
+
+    def delete_folder(self):
+        child_folders = Folder.objects.filter(user=self.user, parent_id=self.item_id)
+        try:
+            for folder in child_folders:
+                folder.delete_folder()
+
+            with open('output.txt', 'w') as f:
+                print(self.item_id, file=f)
+
+            files = File.objects.filter(user=self.user, parent_id=self.item_id)
+
+            try:
+                for file_obj in files:
+                    with open('output2.txt', 'w') as f:
+                        print(file_obj, file=f)
+                    file_obj.delete()
+            except Exception as e:
+                pass
+
+        except Exception as e:
+            raise FolderDeletionError(f"{self.name}")
+        else:
+            self.delete()
+
+        return       
+    
+    
+        def __str__(self):
+            return self.name
 
 
 class File(models.Model):
@@ -111,6 +143,11 @@ class File(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files", default=1)
 
     objects = FileManager()
+
+
+    def delete_file():
+        print('deleting file')
+
 
     def __str__(self):
         return self.name
