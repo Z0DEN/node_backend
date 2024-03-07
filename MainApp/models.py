@@ -104,24 +104,14 @@ class Folder(models.Model):
 
 
     def delete_folder(self):
-        child_folders = Folder.objects.filter(user=self.user, parent_id=self.item_id)
         try:
+            child_folders = Folder.objects.filter(user=self.user, parent_id=self.item_id)
             for folder in child_folders:
                 folder.delete_folder()
 
-            with open('output.txt', 'w') as f:
-                print(self.item_id, file=f)
-
-            files = File.objects.filter(user=self.user, parent_id=self.item_id)
-
-            try:
-                for file_obj in files:
-                    with open('output2.txt', 'w') as f:
-                        print(file_obj, file=f)
-                    file_obj.delete()
-            except Exception as e:
-                pass
-
+            files = File.objects.filter(user=self.user, parent_id__contains=[self.item_id])
+            for file in files:
+                file.delete()
         except Exception as e:
             raise FolderDeletionError(f"{self.name}")
         else:
@@ -145,8 +135,9 @@ class File(models.Model):
     objects = FileManager()
 
 
-    def delete_file():
-        print('deleting file')
+    def delete(self, *args, **kwargs):
+        self.file.delete(save=False)
+        super(File, self).delete(*args, **kwargs)
 
 
     def __str__(self):
