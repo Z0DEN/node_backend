@@ -117,7 +117,7 @@ def DeleteItem(request):
 
     user = User.objects.get(username=username)
     try:
-        item = user.item_type.get(item_id=item_id)
+        item = getattr(user, item_type).get(item_id=item_id)
     except ObjectDoesNotExist:
         return RJR(status=13, msg="item does not exist")
     
@@ -127,6 +127,7 @@ def DeleteItem(request):
         return RJR(status=10, msg=f"Error occurs while deletion item: {e}")
     else:
         return RJR(status=20, msg="item was deleted successfully")
+
 
 
 
