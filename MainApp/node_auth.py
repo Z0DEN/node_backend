@@ -76,8 +76,8 @@ def get_data():
 
 def send_data(data_to_send, func, token_type='main_server_access_token'):
     obj = server_data.objects.first()
-    request_url1 = f'http://192.168.0.98:8002/{func}/'
-    request_url2 = f'http://176.197.34.213:8002/{func}/'
+    request_url1 = f'http://whoole.space/{func}/'
+    request_url2 = f'http://whoole.space/{func}/'
     headers = {'Content-Type': 'application/json'}
 
     if obj is not None and token_type != 'None': 
