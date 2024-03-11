@@ -11,8 +11,8 @@ http {
     gzip_proxied    any;
 
     server {
-        listen ${PORT} ssl http2;
-        listen [::]:${PORT} ssl http2;
+        listen ${port} ssl http2;
+        listen [::]:${port} ssl http2;
 
         server_name ${HOSTNAME}.whoole.space; 
         
