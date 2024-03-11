@@ -39,6 +39,7 @@ def get_data():
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
     UUID = os.environ.get('UUID')
+    port = os.environ.get('port')
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
@@ -67,7 +68,7 @@ def get_data():
         'IN_IP': IN_IP,
         'EX_IP': EX_IP,
         'UUID' : UUID,
-        'local_connection': True,
+        'port': port,
         'node_access_token': local_access_token,
         'node_refresh_token': local_refresh_token,
     }
@@ -76,8 +77,7 @@ def get_data():
 
 def send_data(data_to_send, func, token_type='main_server_access_token'):
     obj = server_data.objects.first()
-    request_url1 = f'https://whoole.space/{func}/'
-    request_url2 = f'https://whoole.space/{func}/'
+    request_url = f'https://whoole.space/{func}/'
     headers = {'Content-Type': 'application/json'}
 
     if obj is not None and token_type != 'None': 
@@ -87,10 +87,9 @@ def send_data(data_to_send, func, token_type='main_server_access_token'):
         headers['Authorization'] = 'personal ' + personal_key
 
     try:
-        response = requests.post(request_url1, data=json.dumps(data_to_send), headers=headers)
-    except requests.exceptions.RequestException:
-         data_to_send["local_connection"] = False
-         response = requests.post(request_url2, data=json.dumps(data_to_send), headers=headers)
+        response = requests.post(request_url, data=json.dumps(data_to_send), headers=headers)
+    except Exception as e:
+        print(f"Error occurs while connection: {e}")
 
     data = response.json()
     status = data["status"]
