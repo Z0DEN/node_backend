@@ -39,7 +39,7 @@ def get_data():
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
     UUID = os.environ.get('UUID')
-    port = os.environ.get('port')
+    PORT = os.environ.get('PORT')
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
@@ -68,7 +68,7 @@ def get_data():
         'IN_IP': IN_IP,
         'EX_IP': EX_IP,
         'UUID' : UUID,
-        'port': port,
+        'port': PORT,
         'node_access_token': local_access_token,
         'node_refresh_token': local_refresh_token,
     }
