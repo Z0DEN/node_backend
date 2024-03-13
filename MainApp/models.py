@@ -114,9 +114,6 @@ class Folder(models.Model):
 
             files = File.objects.filter(user=self.user, parent_id__contains=[self.item_id])
             for file in files:
-                with open('output.txt', 'a') as f:
-                    print(file.name, file=f)
-
                 file.delete()
         except Exception as e:
             raise FolderDeletionError(f"{self.name}")
