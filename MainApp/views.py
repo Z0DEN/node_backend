@@ -40,10 +40,13 @@ def GetUserData(request):
     user_folders = user.get_folders()
     user_files = user.get_files()
 
-    user_data = []
-    user_data.extend(user_files + user_folders)
+    response_data={
+        'data': user_files + user_folders,
+        'available_space': user.available_space,
+        'taken_space': user.taken_space,
+    }
 
-    return RJR(status=20, response_data={'data': user_data})
+    return RJR(status=20, response_data=response_data)
 
 
 @csrf_exempt
@@ -149,6 +152,7 @@ STATUS_LIST = {
     16: "Request have no auth token (Bearer). ",
     17: "User already exist. ", 
     18: 'Folder or file with these names already exist: ',
+    19: 'Files size > available space. ',
     # ------------------------------------------------------------- #
     20: "Undefined success. ",
     21: "Node or user was successfully created. ",

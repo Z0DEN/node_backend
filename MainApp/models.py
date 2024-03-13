@@ -57,6 +57,8 @@ class UserManager(models.Manager):
 class User(models.Model):
     username = models.CharField(unique=True, max_length=255)
     date_added = models.DateTimeField(auto_now_add=True)
+    available_space = models.BigIntegerField(default=16_106_127_360)
+    taken_space = models.BigIntegerField(default=0)
 
     objects = UserManager()
 
@@ -70,6 +72,7 @@ class User(models.Model):
                 'item_id': file.item_id,
                 'parent_id': file.parent_id,
                 'date_added': file.date_added,
+                'size': file.size,
             }
             user_files.append(file_data) 
         return user_files
