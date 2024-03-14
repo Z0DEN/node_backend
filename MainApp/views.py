@@ -79,7 +79,13 @@ def UploadFiles(request):
         return RJR(13)
 
     existed_files = []
+    total_size = 0
+    available = user.available_space
     for file in files:
+        total_size += file.size
+        if total_size > available:
+            return RJR(status=19)
+
         item_id = request.POST.get(file.name)
         _, created = user.files.create_file(file=file, item_id=item_id, parent_id=parent_id)
         if not created:
@@ -87,6 +93,9 @@ def UploadFiles(request):
 
     if existed_files:
         return RJR(status=18, msg=', '.join(existed_files), response_data={'existed_files': existed_files})
+
+    user.taken_space += total_size
+    user.save()
 
     return RJR(25)
 

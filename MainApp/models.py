@@ -72,7 +72,7 @@ class User(models.Model):
                 'item_id': file.item_id,
                 'parent_id': file.parent_id,
                 'date_added': file.date_added,
-#                'size': file.size,
+                'size': file.file.size,
             }
             user_files.append(file_data) 
         return user_files
@@ -139,6 +139,8 @@ class File(models.Model):
 
 
     def delete(self, *args, **kwargs):
+        self.user.taken_space -= self.file.file.size
+        self.user.save()
         self.file.delete(save=False)
         super(File, self).delete(*args, **kwargs)
 
