@@ -23,13 +23,14 @@ def AddUser(request):
     username = json.loads(request.body)['username']
 
     if not username:
-        return RJR(13)
+        return RJR(status=13)
     if User.objects.filter(username=username).exists():
-        return RJR(17)
+        return RJR(status=17)
 
     new_user = User.create_user(username=username)
 
-    return RJR(21)
+    return RJR(status=21)
+
 
 @csrf_exempt
 def GetUserData(request):

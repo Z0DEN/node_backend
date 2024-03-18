@@ -2,7 +2,7 @@ import jwt
 import os
 import redis
 import json
-from django.middleware.common import MiddlewareMixin
+from django.middleware.common import MiddlewareMixin 
 from django.shortcuts import resolve_url
 from django.http import JsonResponse
 from MainApp.models import server_data, User
