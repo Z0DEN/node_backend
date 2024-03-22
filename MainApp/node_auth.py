@@ -40,7 +40,7 @@ def get_data():
     EX_IP = os.environ.get('EX_IP')
     UUID = os.environ.get('UUID')
     PORT = os.environ.get('PORT')
-    SPACE = os.environ.get('SPACE')
+    SPACE = 144955146240
 
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
