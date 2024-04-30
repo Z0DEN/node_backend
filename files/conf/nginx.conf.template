@@ -16,8 +16,8 @@ http {
 
         server_name ${HOSTNAME}.whoole.space; 
         
-	ssl_certificate etc/letsencrypt/live/${HOSTNAME}.whoole.space/fullchain.pem
-	ssl_certificate_key /etc/letsencrypt/live/${HOSTNAME}.whoole.space/privkey.pem
+	ssl_certificate etc/letsencrypt/live/${HOSTNAME}.whoole.space/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/${HOSTNAME}.whoole.space/privkey.pem;
 
 	client_max_body_size 512M;
 
