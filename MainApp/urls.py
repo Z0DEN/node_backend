@@ -13,6 +13,7 @@ urlpatterns = [
     path('DeleteItem/', views.DeleteItem, name='DeleteItem'),
     path('UploadFiles/', views.UploadFiles, name='UploadFiles'),
     path('DownloadFiles/', views.DownloadFiles, name='DownloadFiles'),
+    path('MoveItem/', views.MoveItem, name='MoveItem'),
     path('UpdateNodeTokens/', node_auth.UpdateNodeTokens),
 ] 
 #+ static('media/', document_root='/storage/')

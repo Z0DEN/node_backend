@@ -142,6 +142,16 @@ def DeleteItem(request):
         return RJR(status=20, msg="item was deleted successfully")
 
 
+@csrf_exempt
+def MoveItem(request):
+    data = json.loads(request.body)
+    item_id = data.get('itemId')
+    from_dir = data.get('from')
+    to_dir = data.get('to')
+    if item_id is None or item_id == '':
+        RJR(status=13, msg='item id is should not be empty')
+    return RJR(status=25)
+
 
 
 # ------------------------------------------------------------- #
@@ -170,6 +180,7 @@ STATUS_LIST = {
     23: "Data successfully changed. ",
     24: "Folder was successfully created. ",
     25: "Files was successfully saved. ",
+    25: "File or folder was successfully moved. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
     # ------------------------------------------------------------- #
