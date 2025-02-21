@@ -151,7 +151,7 @@ class File(models.Model):
 
 class server_data(models.Model):
     secret_key = models.CharField(unique=True, max_length=1024)
-    personal_key = models.CharField(max_length=64, default="personal_key")
+    personal_key = models.CharField(max_length=64)
     main_server_access_token = models.CharField(unique=True, max_length=1024)
     main_server_refresh_token = models.CharField(unique=True, max_length=1024)
     date_added = models.DateTimeField(auto_now=True)
