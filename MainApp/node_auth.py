@@ -9,7 +9,7 @@ from .tokens import *
 RPASSWORD = os.environ.get('RPASSWORD')
 REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
 
-personal_key = "personal_key"
+personal_key = os.environ.get('personal_key')
 
 global status_list
 
