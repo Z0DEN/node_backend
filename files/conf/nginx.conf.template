@@ -14,10 +14,10 @@ http {
         listen ${PORT} ssl http2;
         listen [::]:${PORT} ssl http2;
 
-        server_name ${HOSTNAME}.whoole.space; 
+        server_name ${HOSTNAME}.whooole.space; 
         
-	ssl_certificate /etc/letsencrypt/live/${HOSTNAME}.whoole.space/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/${HOSTNAME}.whoole.space/privkey.pem;
+	ssl_certificate /etc/letsencrypt/live/${HOSTNAME}.whooole.space/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/${HOSTNAME}.whooole.space/privkey.pem;
 
 	client_max_body_size 512M;
 
@@ -33,7 +33,7 @@ http {
         ssl_early_data on;
 
 
-        #if ($host != "${HOSTNAME}.whoole.space") {
+        #if ($host != "${HOSTNAME}.whooole.space") {
         #        return 404;
         #}
     }

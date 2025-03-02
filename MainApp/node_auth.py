@@ -83,7 +83,7 @@ def get_data():
 
 def send_data(data_to_send, func, token_type='main_server_access_token'):
     obj = server_data.objects.first()
-    request_url = f'https://whoole.space/{func}/'
+    request_url = f'https://whooole.space/{func}/'
     headers = {'Content-Type': 'application/json'}
 
     if obj is not None and token_type != 'None': 

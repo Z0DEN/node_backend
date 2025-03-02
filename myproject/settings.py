@@ -21,9 +21,9 @@ ALLOWED_HOSTS = [
     EX_IP, 
     'localhost', 
     '127.0.0.1', 
-    "whoole.space", 
-    HOSTNAME + ".whoole.space", 
-    "home.whoole.space", 
+    "whooole.space", 
+    HOSTNAME + ".whooole.space", 
+    "home.whooole.space", 
     "176.197.34.213",
     "192.168.0.98",
 ]
@@ -51,14 +51,14 @@ CORS_ALLOWED_ORIGINS = [
     "https://176.197.34.213",
     "http://176.197.34.213",
 
-    "https://whoole.space",
-    "http://whoole.space",
+    "https://whooole.space",
+    "http://whooole.space",
 ]
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SERVER_CERTIFICATE = f'/etc/letsencrypt/live/{HOSTNAME}.whoole.space/fullchain.pem'
-SERVER_KEY = f'/etc/letsencrypt/live/{HOSTNAME}.whoole.space/privkey.pem'
+SERVER_CERTIFICATE = f'/etc/letsencrypt/live/{HOSTNAME}.whooole.space/fullchain.pem'
+SERVER_KEY = f'/etc/letsencrypt/live/{HOSTNAME}.whooole.space/privkey.pem'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
