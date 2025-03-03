@@ -7,13 +7,9 @@ from MainApp.models import server_data
 from .tokens import *
 
 RPASSWORD = os.environ.get('RPASSWORD')
-REDISKA = redis.Redis(host='localhost', port=6379, password=RPASSWORD, db=0)
+REDISKA = redis.Redis(host='localhost', port=6379, username='redis', password=RPASSWORD, db=0)
 
 personal_key = os.environ.get('PERSONAL_KEY')
-entry = server_data.objects.get(id=1)
-entry.personal_key = personal_key
-entry.save()
-
 
 global status_list
 
@@ -156,6 +152,9 @@ def SaveTokens(main_access_token, main_refresh_token, secret_key, status):
             secret_key = secret_key
         )
         new_data.save()
+        entry = server_data.objects.get(id=1)
+        entry.personal_key = personal_key
+        entry.save()
         REDISKA.setex('server_secret_key', 6000, secret_key)
 
     if status == 23:
