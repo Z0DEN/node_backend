@@ -35,7 +35,7 @@ def decode_token(token, secret_key):
 
 
 def get_data():
-    node_domain = os.environ.get('HOSTNAME')
+    node_domain = os.environ.get('DBNAME')
     IN_IP = os.environ.get('IN_IP')
     EX_IP = os.environ.get('EX_IP')
     UUID = os.environ.get('UUID')

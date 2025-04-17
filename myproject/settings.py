@@ -14,7 +14,7 @@ import os
 
 EX_IP = os.environ.get('EX_IP')
 IN_IP = os.environ.get('IN_IP')
-HOSTNAME = os.environ.get('HOSTNAME')
+HOSTNAME = os.environ.get('DBNAME')
 
 ALLOWED_HOSTS = [
     IN_IP, 
@@ -24,8 +24,6 @@ ALLOWED_HOSTS = [
     "whooole.space", 
     HOSTNAME + ".whooole.space", 
     "home.whooole.space", 
-    "176.197.34.213",
-    "192.168.0.98",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -39,18 +37,12 @@ CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://192.168.0.98",
-    "http://192.168.0.98",
+    "https://" + IN_IP,
+    "http://" + IN_IP,
     
-    "https://192.168.0.81",
-    "http://192.168.0.81",
-
-    "http://127.0.0.1",
-    "https://127.0.0.1",
-
-    "https://176.197.34.213",
-    "http://176.197.34.213",
-
+    "https://" + EX_IP,
+    "http://" + EX_IP,
+    
     "https://whooole.space",
     "http://whooole.space",
 ]
@@ -69,6 +61,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
+#import secrets
+#print(secrets.token_urlsafe(50))
+
 SECRET_KEY = 'django-insecure-f790b_syh@as9^%j(e290_k8mgsq=7mgznh^g0eu(231#w+j!l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -133,11 +129,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DBNAME'),
         'PASSWORD': os.environ.get('DBPASSWORD'),
         'USER': 'django_user',
         'HOST': '/var/run/postgresql',
         'PORT': '',
+#        'OPTIONS': {
+#            'charset': 'utf8',
+#        },
     }
 }
 
@@ -215,8 +215,11 @@ CSRF_COOKIE_NAME = 'csrftoken'
 #}
 
 CORS_ALLOWED_ORIGINS = [
-    'https://192.168.0.98',
-    'http://192.168.0.98',
+    "https://" + IN_IP,
+    "http://" + IN_IP,
+    
+    "https://" + EX_IP,
+    "http://" + EX_IP,
 ]
 
 CORS_EXPOSE_HEADERS = ['*']
@@ -229,3 +232,5 @@ CORS_ALLOW_METHODS = (
     "POST",
     "PUT",
 )
+
+LANGUAGE_CODE = 'ru-RU'
